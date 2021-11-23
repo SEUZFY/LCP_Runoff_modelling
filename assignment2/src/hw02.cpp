@@ -80,7 +80,7 @@ int main(int argc, const char* argv[])
         return 1;
     }
 
-    // Print dataset info
+    //Print dataset info
     double geo_transform[6];
     std::cout << "Driver: " << input_dataset->GetDriver()->GetDescription() << "/" << input_dataset->GetDriver()->GetMetadataItem(GDAL_DMD_LONGNAME) << '\n';
     std::cout << "Size is " << input_dataset->GetRasterXSize() << "x" << input_dataset->GetRasterYSize() << "x" << input_dataset->GetRasterCount() << '\n';
@@ -90,8 +90,36 @@ int main(int argc, const char* argv[])
         std::cout << "Pixel Size = (" << geo_transform[1] << ", " << geo_transform[5] << ")" << '\n';
     }
 
+    // Print Band 1 info
+    GDALRasterBand* input_band = nullptr;
+    int nBlockXSize, nBlockYSize;
+    int bGotMin, bGotMax;
+    double adfMinMax[2];
+    input_band = input_dataset->GetRasterBand(1);
+    input_band->GetBlockSize(&nBlockXSize, &nBlockYSize);
+    std::cout << "Band 1 Block=" << nBlockXSize << "x" << nBlockYSize << " Type=" << GDALGetDataTypeName(input_band->GetRasterDataType()) << " ColorInterp=" << GDALGetColorInterpretationName(input_band->GetColorInterpretation()) << '\n';
+    adfMinMax[0] = input_band->GetMinimum(&bGotMin);
+    adfMinMax[1] = input_band->GetMaximum(&bGotMax);
+    if (!(bGotMin && bGotMax)) GDALComputeRasterMinMax((GDALRasterBandH)input_band, TRUE, adfMinMax);
+    std::cout << "Min=" << adfMinMax[0] << " Max=" << adfMinMax[1] << '\n';
 
+    // Read Band 1 line by line
+    int nXSize = input_band->GetXSize();
+    int nYSize = input_band->GetYSize();
+    Raster input_raster(nXSize, nYSize);
+    for (int current_scanline = 0; current_scanline < nYSize; ++current_scanline) {
+        int* scanline = (int*)CPLMalloc(sizeof(float) * nXSize);
+        if (input_band->RasterIO(GF_Read, 0, current_scanline, nXSize, 1,
+            scanline, nXSize, 1, GDT_Int32,
+            0, 0) != CPLE_None) {
+            std::cerr << "Couldn't read scanline " << current_scanline << std::endl;
+            return 1;
+        } input_raster.add_scanline(scanline);
+        CPLFree(scanline);
+    } std::cout << "Created raster: " << input_raster.max_x << "x" << input_raster.pixels.size() / input_raster.max_y << " = " << input_raster.pixels.size() << '\n';
 
-	std::cout << "hello";
+    GDALClose(input_dataset);
+	std::cout << "hello"<<'\n';
+    std::cout << "world" << '\n';
 	return 0;
 }
