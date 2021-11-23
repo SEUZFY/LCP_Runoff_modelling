@@ -61,37 +61,48 @@ struct RasterCell {
     // Define the order of the linked cells (to be used in a priority_queue)
     bool operator<(const RasterCell& other) const {
         // to do with statements like if (this->elevation > other.elevation) return false/true;
+        return (other.elevation) > (this->elevation) ? true : false;
     }
 };
 
 // Write the values in a linked raster cell (useful for debugging)
 std::ostream& operator<<(std::ostream& os, const RasterCell& c) {
-    os << "{h=" << c.elevation << ", o=" << c.insertion_order << ", x=" << c.x << ", y=" << c.y << "}";
+    os << "{h=" << c.elevation << ", o=" << c.insertion_order << ", x=" << c.x 
+        << ", y=" << c.y << "}";
     return os;
 }
 
 int main(int argc, const char* argv[])
 {
-	GDALDataset* input_dataset = nullptr;
-    GDALAllRegister();
-    input_dataset = (GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N25W101.hgt", GA_ReadOnly); // a nice tile I used for testing
-    if (input_dataset == nullptr) {
-        std::cerr << "Couldn't open file" << std::endl;
-        return 1;
-    }
+    
+    Raster r(3, 3);
+    r.fill();
+    r(2, 2) = 1;
+    //std::cout<<r(0,0);
+
+    RasterCell cella(0, 0, 20, 1), cellb(0, 0, 30, 2);
+    std::cout << (cella < cellb);
+
+    //GDALDataset* input_dataset = nullptr;
+ //   GDALAllRegister();
+ //   input_dataset = (GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N25W101.hgt", GA_ReadOnly); // a nice tile I used for testing
+ //   if (input_dataset == nullptr) {
+ //       std::cerr << "Couldn't open file" << std::endl;
+ //       return 1;
+ //   }
 
     //Print dataset info
-    double geo_transform[6];
+    /*double geo_transform[6];
     std::cout << "Driver: " << input_dataset->GetDriver()->GetDescription() << "/" << input_dataset->GetDriver()->GetMetadataItem(GDAL_DMD_LONGNAME) << '\n';
     std::cout << "Size is " << input_dataset->GetRasterXSize() << "x" << input_dataset->GetRasterYSize() << "x" << input_dataset->GetRasterCount() << '\n';
     if (input_dataset->GetProjectionRef() != NULL) std::cout << "Projection is '" << input_dataset->GetProjectionRef() << "'" << '\n';
     if (input_dataset->GetGeoTransform(geo_transform) == CE_None) {
         std::cout << "Origin = (" << geo_transform[0] << ", " << geo_transform[3] << ")" << '\n';
         std::cout << "Pixel Size = (" << geo_transform[1] << ", " << geo_transform[5] << ")" << '\n';
-    }
+    }*/
 
     // Print Band 1 info
-    GDALRasterBand* input_band = nullptr;
+    /*GDALRasterBand* input_band = nullptr;
     int nBlockXSize, nBlockYSize;
     int bGotMin, bGotMax;
     double adfMinMax[2];
@@ -101,10 +112,10 @@ int main(int argc, const char* argv[])
     adfMinMax[0] = input_band->GetMinimum(&bGotMin);
     adfMinMax[1] = input_band->GetMaximum(&bGotMax);
     if (!(bGotMin && bGotMax)) GDALComputeRasterMinMax((GDALRasterBandH)input_band, TRUE, adfMinMax);
-    std::cout << "Min=" << adfMinMax[0] << " Max=" << adfMinMax[1] << '\n';
+    std::cout << "Min=" << adfMinMax[0] << " Max=" << adfMinMax[1] << '\n';*/
 
     // Read Band 1 line by line
-    int nXSize = input_band->GetXSize();
+    /*int nXSize = input_band->GetXSize();
     int nYSize = input_band->GetYSize();
     Raster input_raster(nXSize, nYSize);
     for (int current_scanline = 0; current_scanline < nYSize; ++current_scanline) {
@@ -118,8 +129,8 @@ int main(int argc, const char* argv[])
         CPLFree(scanline);
     } std::cout << "Created raster: " << input_raster.max_x << "x" << input_raster.pixels.size() / input_raster.max_y << " = " << input_raster.pixels.size() << '\n';
 
-    GDALClose(input_dataset);
-	std::cout << "hello"<<'\n';
-    std::cout << "world" << '\n';
+    GDALClose(input_dataset);*/
+	/*std::cout << "hello"<<'\n';
+    std::cout << "world" << '\n';*/
 	return 0;
 }
