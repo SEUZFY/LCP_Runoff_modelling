@@ -6,16 +6,21 @@
 #include "gdal_priv.h"
 #include "cpl_conv.h"
 
+using std::cout;
+using std::ios;
+using std::cerr;
+using std::ofstream;
+
 // Storage and access of a raster of a given size
 struct Raster {
     std::vector<int> pixels; // where everything is stored
     int nrows, ncols; // number of rows and cols
 
     // Initialise a raster with rows and cols
-    Raster(int rows, int cols) {
+    Raster(int& rows, int& cols) {
         nrows = rows;
         ncols = cols;
-        unsigned int total_pixels = rows * cols;
+        unsigned int total_pixels = rows * cols; //unsigned int for big size
         pixels.reserve(total_pixels);
     }
 
@@ -32,14 +37,14 @@ struct Raster {
     }
 
     // Access the value of a raster cell to read or write it
-    int& operator()(int row, int col) {
+    int& operator()(int& row, int& col) {
         assert(row >= 0 && row < nrows);
         assert(col >= 0 && col < ncols);
         return pixels[col + row * ncols];
     }
 
     // Access the value of a raster cell to read it
-    int operator()(int row, int col) const {
+    int operator()(int& row, int& col) const {
         assert(row >= 0 && row < nrows);
         assert(col >= 0 && col < ncols);
         return pixels[col + row * ncols];
@@ -53,7 +58,7 @@ struct RasterCell {
     int insertion_order;
 
     // Defines a new link to a cell
-    RasterCell(int c_row, int c_col, int elevation, int insertion_order) {
+    RasterCell(int& c_row, int& c_col, int& elevation, int& insertion_order) {
         this->row = c_row;
         this->col = c_col;
         this->elevation = elevation;
@@ -78,10 +83,10 @@ std::ostream& operator<<(std::ostream& os, const RasterCell& c) {
 void output_raster(const Raster& raster, const double& pixelsize, const double& topx, const double& topy)
 {
     int ncols(raster.ncols), nrows(raster.nrows);
-    double lowy = topy - pixelsize * raster.nrows;
+    double lowy(topy - pixelsize * raster.nrows);
 
-    std::ofstream outfile("D:/AlbertQ2/GEO1015/test.asc", std::ios::out); 
-    if (!outfile)std::cout << "File open issue, please check. " << '\n';
+    ofstream outfile("D:/AlbertQ2/GEO1015/test.asc", ios::out); 
+    if (!outfile)cout << "File open issue, please check. " << '\n';
     else
     {
         outfile << "NCOLS" << " " << ncols << '\n';
@@ -97,10 +102,8 @@ void output_raster(const Raster& raster, const double& pixelsize, const double& 
                 outfile << raster(i, j) << " ";
             outfile << '\n';
         }
-
         outfile.close(); // close the file
-    }
-   
+    }  
 }
 
 
@@ -115,34 +118,36 @@ int main(int argc, const char* argv[])
     //RasterCell cella(0, 0, 20, 1), cellb(0, 0, 30, 2);
     //std::cout << (cella < cellb);
 
+    ios::sync_with_stdio(false); //speed up for cin and cout
+
     GDALDataset* input_dataset = nullptr;
     GDALAllRegister();
-    input_dataset = (GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N25W101.hgt", GA_ReadOnly); // a nice tile I used for testing
+    input_dataset = (GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N25W101.hgt", GA_ReadOnly); // a nice tile for testing
     if (input_dataset == nullptr) {
-        std::cerr << "Couldn't open file" << std::endl;
+        cerr << "Couldn't open file" << '\n';
         return 1;
     }
 
     //Print dataset info
-    std::cout << '\n';
-    std::cout << "dataset info: " << '\n';
+    cout << '\n';
+    cout << "dataset info: " << '\n';
 
     double geo_transform[6]{ 0 };
-    std::cout << "Driver: " << input_dataset->GetDriver()->GetDescription() 
+    cout << "Driver: " << input_dataset->GetDriver()->GetDescription()
         << "/" << input_dataset->GetDriver()->GetMetadataItem(GDAL_DMD_LONGNAME) << '\n';
-    std::cout << "width size is: " << input_dataset->GetRasterXSize() << '\n';
-    std::cout << "hight size is: " << input_dataset->GetRasterYSize() << '\n';
-    std::cout << "the number of raster bands: " << input_dataset->GetRasterCount() << '\n';
+    cout << "width size is: " << input_dataset->GetRasterXSize() << '\n';
+    cout << "hight size is: " << input_dataset->GetRasterYSize() << '\n';
+    cout << "the number of raster bands: " << input_dataset->GetRasterCount() << '\n';
     
-    if (input_dataset->GetProjectionRef() != NULL) std::cout << "Projection is '" << input_dataset->GetProjectionRef() << "'" << '\n';
+    if (input_dataset->GetProjectionRef() != NULL) cout << "Projection is '" << input_dataset->GetProjectionRef() << "'" << '\n';
     if (input_dataset->GetGeoTransform(geo_transform) == CE_None) {
-        std::cout << "Origin = (" << geo_transform[0] << ", " << geo_transform[3] << ")" << '\n';
-        std::cout << "Pixel Size = (" << geo_transform[1] << ", " << geo_transform[5] << ")" << '\n';
+        cout << "Origin = (" << geo_transform[0] << ", " << geo_transform[3] << ")" << '\n';
+        cout << "Pixel Size = (" << geo_transform[1] << ", " << geo_transform[5] << ")" << '\n';
     }//Origin is the top-left corner
 
     // Print Band 1 info
-    std::cout << '\n';
-    std::cout << "Band 1 info: " << '\n';
+    cout << '\n';
+    cout << "Band 1 info: " << '\n';
 
     GDALRasterBand* input_band = nullptr;
     int nBlockXSize, nBlockYSize;
@@ -150,35 +155,37 @@ int main(int argc, const char* argv[])
     double adfMinMax[2]{ 0 };
     input_band = input_dataset->GetRasterBand(1);
     input_band->GetBlockSize(&nBlockXSize, &nBlockYSize); //XSize=3601, YSize=1, "scanline"
-    std::cout << "Band 1 Block=" << nBlockXSize << " x " << nBlockYSize << " Type=" 
+    cout << "Band 1 Block=" << nBlockXSize << " x " << nBlockYSize << " Type=" 
         << GDALGetDataTypeName(input_band->GetRasterDataType()) << " ColorInterp=" 
         << GDALGetColorInterpretationName(input_band->GetColorInterpretation()) << '\n';
 
     adfMinMax[0] = input_band->GetMinimum(&bGotMin);
     adfMinMax[1] = input_band->GetMaximum(&bGotMax);
     if (!(bGotMin && bGotMax)) GDALComputeRasterMinMax((GDALRasterBandH)input_band, TRUE, adfMinMax);
-    std::cout << "Min=" << adfMinMax[0] << " Max=" << adfMinMax[1] << '\n';
+    cout << "Min=" << adfMinMax[0] << " Max=" << adfMinMax[1] << '\n';
 
     // Read Band 1 line by line
-    int nXSize = input_band->GetXSize(); //width(ncols)
-    int nYSize = input_band->GetYSize(); //height(nrows)
+    int nXSize(input_band->GetXSize()); //width(ncols)
+    int nYSize(input_band->GetYSize()); //height(nrows)
     Raster input_raster(nYSize, nXSize); //Raster(nrows, ncols)
 
+    int* scanline((int*)CPLMalloc(sizeof(float) * nXSize));
     for (int current_scanline = 0; current_scanline < nYSize; ++current_scanline)
     {
-        int* scanline = (int*)CPLMalloc(sizeof(float) * nXSize); // DONT forget to use CPLFree(scanline)
+        //int* scanline((int*)CPLMalloc(sizeof(float) * nXSize)); // DONT forget to use CPLFree(scanline)
         if (input_band->RasterIO(GF_Read, 0, current_scanline, nXSize, 1,
             scanline, nXSize, 1, GDT_Int32,
             0, 0) != CPLE_None)
         {
-            std::cerr << "Couldn't read scanline " << current_scanline << std::endl;
+            cerr << "Couldn't read scanline " << current_scanline << '\n';
             return 1;
         }
         input_raster.add_scanline(scanline);
-        CPLFree(scanline); //corresponding to the allocation "scanline"
+        //CPLFree(scanline); //corresponding to the allocation "scanline"
     }
+    CPLFree(scanline);
 
-    std::cout << "Created raster: " << input_raster.nrows << " x " 
+    cout << "Created raster: " << input_raster.nrows << " x " 
         << input_raster.ncols << " = " << input_raster.pixels.size() << '\n';
     
     output_raster(input_raster, geo_transform[1], geo_transform[0], geo_transform[3]);
