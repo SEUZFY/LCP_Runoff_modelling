@@ -9,53 +9,53 @@
 // Storage and access of a raster of a given size
 struct Raster {
     std::vector<int> pixels; // where everything is stored
-    int max_x, max_y; // number of columns and rows
+    int nrows, ncols; // number of rows and cols
 
-    // Initialise a raster with x columns and y rows
-    Raster(int x, int y) {
-        max_x = x;
-        max_y = y;
-        unsigned int total_pixels = x * y;
+    // Initialise a raster with rows and cols
+    Raster(int rows, int cols) {
+        nrows = rows;
+        ncols = cols;
+        unsigned int total_pixels = rows * cols;
         pixels.reserve(total_pixels);
     }
 
     // Fill values of an entire row
     void add_scanline(const int* line) {
-        for (int i = 0; i < max_x; ++i) pixels.push_back(line[i]);
+        for (int i = 0; i < ncols; ++i) pixels.push_back(line[i]);
         
     }
 
     // Fill entire raster with zeros
     void fill() {
-        unsigned int total_pixels = max_x * max_y;
+        unsigned int total_pixels = nrows * ncols;
         for (unsigned int i = 0; i < total_pixels; ++i) pixels.push_back(0);
     }
 
     // Access the value of a raster cell to read or write it
-    int& operator()(int x, int y) {
-        assert(x >= 0 && x < max_x);
-        assert(y >= 0 && y < max_y);
-        return pixels[y + x * max_x];
+    int& operator()(int row, int col) {
+        assert(row >= 0 && row < nrows);
+        assert(col >= 0 && col < ncols);
+        return pixels[col + row * ncols];
     }
 
     // Access the value of a raster cell to read it
-    int operator()(int x, int y) const {
-        assert(x >= 0 && x < max_x);
-        assert(y >= 0 && y < max_y);
-        return pixels[y + x * max_x];
+    int operator()(int row, int col) const {
+        assert(row >= 0 && row < nrows);
+        assert(col >= 0 && col < ncols);
+        return pixels[col + row * ncols];
     }
 };
 
 // A structure that links to a single cell in a Raster
 struct RasterCell {
-    int x, y; // row and column of the cell
+    int row, col; // row and column of the cell
     int elevation;
     int insertion_order;
 
     // Defines a new link to a cell
-    RasterCell(int x, int y, int elevation, int insertion_order) {
-        this->x = x;
-        this->y = y;
+    RasterCell(int c_row, int c_col, int elevation, int insertion_order) {
+        this->row = c_row;
+        this->col = c_col;
         this->elevation = elevation;
         this->insertion_order = insertion_order;
     }
@@ -69,16 +69,16 @@ struct RasterCell {
 
 // Write the values in a linked raster cell (useful for debugging)
 std::ostream& operator<<(std::ostream& os, const RasterCell& c) {
-    os << "{h=" << c.elevation << ", o=" << c.insertion_order << ", x=" << c.x 
-        << ", y=" << c.y << "}";
+    os << "{h=" << c.elevation << ", o=" << c.insertion_order << ", row=" << c.row 
+        << ", col=" << c.col << "}";
     return os;
 }
 
 // Write the raster file to an .asc file
 void output_raster(const Raster& raster, const double& pixelsize, const double& topx, const double& topy)
 {
-    int ncols(raster.max_x), nrows(raster.max_y);
-    double lowy = topy - pixelsize * raster.max_y;
+    int ncols(raster.ncols), nrows(raster.nrows);
+    double lowy = topy - pixelsize * raster.nrows;
 
     std::ofstream outfile("D:/AlbertQ2/GEO1015/test.asc", std::ios::out); 
     if (!outfile)std::cout << "File open issue, please check. " << '\n';
@@ -160,9 +160,9 @@ int main(int argc, const char* argv[])
     std::cout << "Min=" << adfMinMax[0] << " Max=" << adfMinMax[1] << '\n';
 
     // Read Band 1 line by line
-    int nXSize = input_band->GetXSize(); //width
-    int nYSize = input_band->GetYSize(); //height
-    Raster input_raster(nXSize, nYSize);
+    int nXSize = input_band->GetXSize(); //width(ncols)
+    int nYSize = input_band->GetYSize(); //height(nrows)
+    Raster input_raster(nYSize, nXSize); //Raster(nrows, ncols)
 
     for (int current_scanline = 0; current_scanline < nYSize; ++current_scanline)
     {
@@ -178,14 +178,13 @@ int main(int argc, const char* argv[])
         CPLFree(scanline); //corresponding to the allocation "scanline"
     }
 
-    std::cout << "Created raster: " << input_raster.max_x << " x " 
-        << input_raster.max_y << " = " << input_raster.pixels.size() << '\n';
+    std::cout << "Created raster: " << input_raster.nrows << " x " 
+        << input_raster.ncols << " = " << input_raster.pixels.size() << '\n';
     
-    double yll = 25;
     output_raster(input_raster, geo_transform[1], geo_transform[0], geo_transform[3]);
     
     // Flow direction
-    //Raster flow_direction(input_raster.max_x, input_raster.max_y);
+    //Raster flow_direction(input_raster.ncols, input_raster.nrows);
     //flow_direction.fill();
     //std::priority_queue<RasterCell, std::deque<RasterCell>> cells_to_process_flow;
     // to do
@@ -194,7 +193,7 @@ int main(int argc, const char* argv[])
     // to do
 
     // Flow accumulation
-    //Raster flow_accumulation(input_raster.max_x, input_raster.max_y);
+    //Raster flow_accumulation(input_raster.ncols, input_raster.nrows);
     // to do
 
     // Write flow accumulation
