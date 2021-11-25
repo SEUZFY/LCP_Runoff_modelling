@@ -2,7 +2,9 @@
 #include <queue>
 #include <cassert>
 #include <fstream>
-
+#include <chrono>
+#include <thread>
+#include <future>
 #include "gdal_priv.h"
 #include "cpl_conv.h"
 
@@ -10,6 +12,14 @@ using std::cout;
 using std::ios;
 using std::cerr;
 using std::ofstream;
+using std::chrono::system_clock;
+using std::chrono::duration_cast;
+using std::chrono::seconds;
+using std::this_thread::sleep_for;
+using std::future;
+using std::launch;
+using std::async;
+
 
 // Storage and access of a raster of a given size
 struct Raster {
@@ -98,12 +108,31 @@ void output_raster(const Raster& raster, const double& pixelsize, const double& 
 
         for (int i = 0; i < nrows; ++i)
         {
-            for (int j = 0; j < ncols; ++j)
-                outfile << raster(i, j) << " ";
+            for (int j = 0; j < ncols; ++j) outfile << raster(i, j) << " ";
             outfile << '\n';
         }
         outfile.close(); // close the file
     }  
+}
+
+
+Raster flow_direction(Raster raster)
+{
+    sleep_for(seconds(2));
+    return raster;
+}
+
+
+Raster flow_accumulation(Raster raster)
+{
+    sleep_for(seconds(2));
+    return raster;
+}
+
+int test()
+{
+    sleep_for(seconds(2));
+    return 0;
 }
 
 
@@ -188,7 +217,23 @@ int main(int argc, const char* argv[])
     cout << "Created raster: " << input_raster.nrows << " x " 
         << input_raster.ncols << " = " << input_raster.pixels.size() << '\n';
     
-    output_raster(input_raster, geo_transform[1], geo_transform[0], geo_transform[3]);
+    int Sum(0);
+    // Get Start Time
+    system_clock::time_point start = system_clock::now();
+
+    //flow_direction(input_raster);
+    //future<Raster> resultFromDirection = async(launch::async, flow_direction, input_raster);
+    future<int> resultFromDirection = async(launch::async, test);
+    flow_accumulation(input_raster);
+    resultFromDirection.get();
+
+    // Get End Time
+    auto end = system_clock::now();
+    auto diff = duration_cast <seconds> (end - start).count();
+    cout << "Total Time Taken = " << diff << " Seconds" << '\n';
+
+
+    //output_raster(input_raster, geo_transform[1], geo_transform[0], geo_transform[3]);
     
     // Flow direction
     //Raster flow_direction(input_raster.ncols, input_raster.nrows);
