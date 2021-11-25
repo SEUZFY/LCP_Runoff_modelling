@@ -27,17 +27,14 @@ struct Raster {
     int nrows, ncols; // number of rows and cols
 
     // Initialise a raster with rows and cols
-    Raster(int& rows, int& cols) {
-        nrows = rows;
-        ncols = cols;
+    Raster(const int& rows, const int& cols):nrows(rows), ncols(cols){
         unsigned int total_pixels = rows * cols; //unsigned int for big size
         pixels.reserve(total_pixels);
     }
 
     // Fill values of an entire row
     void add_scanline(const int* line) {
-        for (int i = 0; i < ncols; ++i) pixels.push_back(line[i]);
-        
+        for (int i = 0; i < ncols; ++i) pixels.push_back(line[i]);      
     }
 
     // Fill entire raster with zeros
@@ -47,18 +44,26 @@ struct Raster {
     }
 
     // Access the value of a raster cell to read or write it
-    int& operator()(int& row, int& col) {
+    int& operator()(const int& row, const int& col) {
         assert(row >= 0 && row < nrows);
         assert(col >= 0 && col < ncols);
         return pixels[col + row * ncols];
     }
 
     // Access the value of a raster cell to read it
-    int operator()(int& row, int& col) const {
+    int operator()(const int& row, const int& col) const {
         assert(row >= 0 && row < nrows);
         assert(col >= 0 && col < ncols);
         return pixels[col + row * ncols];
     }
+
+    //Access the value of a raster cell to set its value
+    void set_value(const int& row, const int& col, const int& value) {
+        assert(row >= 0 && row < nrows);
+        assert(col >= 0 && col < ncols);
+        pixels[col + row * ncols] = value;
+    }
+    
 };
 
 // A structure that links to a single cell in a Raster
@@ -68,12 +73,8 @@ struct RasterCell {
     int insertion_order;
 
     // Defines a new link to a cell
-    RasterCell(int& c_row, int& c_col, int& elevation, int& insertion_order) {
-        this->row = c_row;
-        this->col = c_col;
-        this->elevation = elevation;
-        this->insertion_order = insertion_order;
-    }
+    RasterCell(int c_row, int c_col, int elevation, int insertion_order) :row(c_row), col(c_col),
+        elevation(elevation), insertion_order(insertion_order) {}
 
     // Define the order of the linked cells (to be used in a priority_queue)
     bool operator<(const RasterCell& other) const {
@@ -116,23 +117,16 @@ void output_raster(const Raster& raster, const double& pixelsize, const double& 
 }
 
 
-Raster flow_direction(Raster raster)
+void flow_direction(Raster* raster)
 {
     sleep_for(seconds(2));
-    return raster;
+    raster->set_value(2, 3, 4);
 }
 
 
-Raster flow_accumulation(Raster raster)
+void flow_accumulation(Raster raster)
 {
     sleep_for(seconds(2));
-    return raster;
-}
-
-int test()
-{
-    sleep_for(seconds(2));
-    return 0;
 }
 
 
@@ -142,7 +136,7 @@ int main(int argc, const char* argv[])
     //Raster r(3, 3);
     //r.fill();
     //r(2, 2) = 1;
-    //std::cout<<r(0,0);
+    //std::cout<<r(2,2);
 
     //RasterCell cella(0, 0, 20, 1), cellb(0, 0, 30, 2);
     //std::cout << (cella < cellb);
@@ -217,13 +211,13 @@ int main(int argc, const char* argv[])
     cout << "Created raster: " << input_raster.nrows << " x " 
         << input_raster.ncols << " = " << input_raster.pixels.size() << '\n';
     
-    int Sum(0);
     // Get Start Time
     system_clock::time_point start = system_clock::now();
 
-    //flow_direction(input_raster);
-    //future<Raster> resultFromDirection = async(launch::async, flow_direction, input_raster);
-    future<int> resultFromDirection = async(launch::async, test);
+    Raster r_flow_direction(input_raster.nrows, input_raster.ncols);
+    r_flow_direction.fill();
+
+    future<void> resultFromDirection = async(launch::async, flow_direction, &r_flow_direction);
     flow_accumulation(input_raster);
     resultFromDirection.get();
 
