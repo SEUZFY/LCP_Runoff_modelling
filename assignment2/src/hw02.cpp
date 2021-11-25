@@ -107,11 +107,12 @@ void output_raster(const Raster& raster, const double& pixelsize, const double& 
         outfile << "CELLSIZE" << " " << pixelsize << '\n';
         outfile << "NODATA_VALUE" << " " << -9999 << '\n';
 
-        for (int i = 0; i < nrows; ++i)
+        for (int i = 0; i != nrows; ++i)
         {
-            for (int j = 0; j < ncols; ++j) outfile << raster(i, j) << " ";
+            for (int j = 0; j != ncols; ++j) outfile << raster(i,j) << " ";
             outfile << '\n';
         }
+  
         outfile.close(); // close the file
     }  
 }
@@ -143,10 +144,9 @@ int main(int argc, const char* argv[])
 
     ios::sync_with_stdio(false); //speed up for cin and cout
 
-    GDALDataset* input_dataset = nullptr;
     GDALAllRegister();
-    input_dataset = (GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N25W101.hgt", GA_ReadOnly); // a nice tile for testing
-    if (input_dataset == nullptr) {
+    GDALDataset* input_dataset((GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N25W101.hgt", GA_ReadOnly));
+    if (!input_dataset) {
         cerr << "Couldn't open file" << '\n';
         return 1;
     }
@@ -172,11 +172,11 @@ int main(int argc, const char* argv[])
     cout << '\n';
     cout << "Band 1 info: " << '\n';
 
-    GDALRasterBand* input_band = nullptr;
+    GDALRasterBand* input_band(input_dataset->GetRasterBand(1));
     int nBlockXSize, nBlockYSize;
     int bGotMin, bGotMax;
     double adfMinMax[2]{ 0 };
-    input_band = input_dataset->GetRasterBand(1);
+    
     input_band->GetBlockSize(&nBlockXSize, &nBlockYSize); //XSize=3601, YSize=1, "scanline"
     cout << "Band 1 Block=" << nBlockXSize << " x " << nBlockYSize << " Type=" 
         << GDALGetDataTypeName(input_band->GetRasterDataType()) << " ColorInterp=" 
@@ -193,7 +193,7 @@ int main(int argc, const char* argv[])
     Raster input_raster(nYSize, nXSize); //Raster(nrows, ncols)
 
     int* scanline((int*)CPLMalloc(sizeof(float) * nXSize));
-    for (int current_scanline = 0; current_scanline < nYSize; ++current_scanline)
+    for (int current_scanline = 0; current_scanline != nYSize; ++current_scanline)
     {
         //int* scanline((int*)CPLMalloc(sizeof(float) * nXSize)); // DONT forget to use CPLFree(scanline)
         if (input_band->RasterIO(GF_Read, 0, current_scanline, nXSize, 1,
@@ -212,23 +212,24 @@ int main(int argc, const char* argv[])
         << input_raster.ncols << " = " << input_raster.pixels.size() << '\n';
     
     // Get Start Time
-    system_clock::time_point start = system_clock::now();
+    //system_clock::time_point start = system_clock::now();
 
-    Raster r_flow_direction(input_raster.nrows, input_raster.ncols);
-    r_flow_direction.fill();
+    //Raster r_flow_direction(input_raster.nrows, input_raster.ncols);
+    //r_flow_direction.fill();
 
-    future<void> resultFromDirection = async(launch::async, flow_direction, &r_flow_direction);
-    flow_accumulation(input_raster);
-    resultFromDirection.get();
+    //future<void> resultFromDirection = async(launch::async, flow_direction, &r_flow_direction);
+    //flow_accumulation(input_raster);
+    //resultFromDirection.get();
 
-    // Get End Time
-    auto end = system_clock::now();
-    auto diff = duration_cast <seconds> (end - start).count();
-    cout << "Total Time Taken = " << diff << " Seconds" << '\n';
+    //// Get End Time
+    //auto end = system_clock::now();
+    //auto diff = duration_cast <seconds> (end - start).count();
+    //cout << "Total Time Taken = " << diff << " Seconds" << '\n';
 
 
     //output_raster(input_raster, geo_transform[1], geo_transform[0], geo_transform[3]);
-    
+   
+
     // Flow direction
     //Raster flow_direction(input_raster.ncols, input_raster.nrows);
     //flow_direction.fill();
