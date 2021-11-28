@@ -1,12 +1,14 @@
 #include <iostream>
 #include <queue>
-#include <cassert>
 #include <fstream>
 #include <chrono>
 #include <thread>
 #include <future>
 #include "gdal_priv.h"
 #include "cpl_conv.h"
+
+#include "Raster.h"
+#include "RasterCell.h"
 
 using std::cout;
 using std::ios;
@@ -20,68 +22,6 @@ using std::future;
 using std::launch;
 using std::async;
 
-
-// Storage and access of a raster of a given size
-struct Raster {
-    std::vector<int> pixels; // where everything is stored
-    int nrows, ncols; // number of rows and cols
-
-    // Initialise a raster with rows and cols
-    Raster(const int& rows, const int& cols):nrows(rows), ncols(cols){
-        unsigned int total_pixels = rows * cols; //unsigned int for big size
-        pixels.reserve(total_pixels);
-    }
-
-    // Fill values of an entire row
-    void add_scanline(const int* line) {
-        for (int i = 0; i < ncols; ++i) pixels.push_back(line[i]);      
-    }
-
-    // Fill entire raster with zeros
-    void fill() {
-        unsigned int total_pixels = nrows * ncols;
-        for (unsigned int i = 0; i < total_pixels; ++i) pixels.push_back(0);
-    }
-
-    // Access the value of a raster cell to read or write it
-    int& operator()(const int& row, const int& col) {
-        assert(row >= 0 && row < nrows);
-        assert(col >= 0 && col < ncols);
-        return pixels[col + row * ncols];
-    }
-
-    // Access the value of a raster cell to read it
-    int operator()(const int& row, const int& col) const {
-        assert(row >= 0 && row < nrows);
-        assert(col >= 0 && col < ncols);
-        return pixels[col + row * ncols];
-    }
-
-    //Access the value of a raster cell to set its value
-    void set_value(const int& row, const int& col, const int& value) {
-        assert(row >= 0 && row < nrows);
-        assert(col >= 0 && col < ncols);
-        pixels[col + row * ncols] = value;
-    }
-    
-};
-
-// A structure that links to a single cell in a Raster
-struct RasterCell {
-    int row, col; // row and column of the cell
-    int elevation;
-    int insertion_order;
-
-    // Defines a new link to a cell
-    RasterCell(int c_row, int c_col, int elevation, int insertion_order) :row(c_row), col(c_col),
-        elevation(elevation), insertion_order(insertion_order) {}
-
-    // Define the order of the linked cells (to be used in a priority_queue)
-    bool operator<(const RasterCell& other) const {
-        // to do with statements like if (this->elevation > other.elevation) return false/true;
-        return (other.elevation) > (this->elevation) ? true : false;
-    }
-};
 
 // Write the values in a linked raster cell (useful for debugging)
 std::ostream& operator<<(std::ostream& os, const RasterCell& c) {
@@ -231,16 +171,34 @@ int main(int argc, const char* argv[])
    
 
     // Flow direction
-    //Raster flow_direction(input_raster.ncols, input_raster.nrows);
+    //Raster flow_direction(input_raster.nrows, input_raster.ncols);
     //flow_direction.fill();
-    //std::priority_queue<RasterCell, std::deque<RasterCell>> cells_to_process_flow;
+    
+    std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
+    unsigned int size(input_raster.pixels.size());
+    
+    RasterCell c1(0, 0, 20, 3);
+    RasterCell c2(0, 1, 25, 1);
+    RasterCell c3(1, 1, 30, 2);
+    RasterCell c4(2, 1, 32, 4);
+
+    cells_queue.push(c1); cells_queue.push(c2);
+    cells_queue.push(c3); cells_queue.push(c4);
+
+    while (!cells_queue.empty())
+    {
+         cout << cells_queue.top() << ' ';
+         cells_queue.pop();
+    } 
+
+
     // to do
 
     // Write flow direction
     // to do
 
     // Flow accumulation
-    //Raster flow_accumulation(input_raster.ncols, input_raster.nrows);
+    //Raster flow_accumulation(input_raster.nrows, input_raster.ncols);
     // to do
 
     // Write flow accumulation
