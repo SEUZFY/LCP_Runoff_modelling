@@ -174,22 +174,24 @@ int main(int argc, const char* argv[])
     //Raster flow_direction(input_raster.nrows, input_raster.ncols);
     //flow_direction.fill();
     
-    std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
-    unsigned int size(input_raster.pixels.size());
-    
-    RasterCell c1(0, 0, 20, 3);
-    RasterCell c2(0, 1, 25, 1);
-    RasterCell c3(1, 1, 30, 2);
-    RasterCell c4(2, 1, 32, 4);
+    //std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
+    //unsigned int size(input_raster.pixels.size());
+    //int order(0);
+    //for (int i = 0; i != nYSize; ++i)
+    //{
+    //    for (int j = 0; j != nXSize; ++j)
+    //    {
+    //        //calculate insertion order for each cell: order
+    //        order += 1;
+    //        cells_queue.push(RasterCell(i, j, input_raster(i, j), order));
+    //    }         
+    //}
 
-    cells_queue.push(c1); cells_queue.push(c2);
-    cells_queue.push(c3); cells_queue.push(c4);
-
-    while (!cells_queue.empty())
-    {
-         cout << cells_queue.top() << ' ';
-         cells_queue.pop();
-    } 
+    //while (!cells_queue.empty())
+    //{
+    //     cout << cells_queue.top() << ' ';
+    //     cells_queue.pop();
+    //} 
 
 
     // to do

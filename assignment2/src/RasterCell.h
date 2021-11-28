@@ -8,7 +8,7 @@ struct RasterCell {
     int insertion_order;
 
     // Defines a new link to a cell
-    RasterCell(int c_row, int c_col, int elevation, int insertion_order);
+    RasterCell(const int& c_row, const int& c_col, const int& elevation, const int& insertion_order);
 
     // Define the order of the linked cells (to be used in a priority_queue)
     bool operator<(const RasterCell& other) const;
