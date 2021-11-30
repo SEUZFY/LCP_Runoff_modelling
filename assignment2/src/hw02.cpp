@@ -9,6 +9,7 @@
 
 #include "Raster.h"
 #include "RasterCell.h"
+#include "Direction.h"
 
 using std::cout;
 using std::ios;
@@ -72,20 +73,13 @@ void flow_accumulation(Raster raster)
 
 
 int main(int argc, const char* argv[])
-{
-    
-    //Raster r(3, 3);
-    //r.fill();
-    //r(2, 2) = 1;
-    //std::cout<<r(2,2);
-
-    //RasterCell cella(0, 0, 20, 1), cellb(0, 0, 30, 2);
-    //std::cout << (cella < cellb);
+{  
 
     ios::sync_with_stdio(false); //speed up for cin and cout
 
+    /*
     GDALAllRegister();
-    GDALDataset* input_dataset((GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N25W101.hgt", GA_ReadOnly));
+    GDALDataset* input_dataset((GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N29E120.hgt", GA_ReadOnly));
     if (!input_dataset) {
         cerr << "Couldn't open file" << '\n';
         return 1;
@@ -150,6 +144,33 @@ int main(int argc, const char* argv[])
 
     cout << "Created raster: " << input_raster.nrows << " x " 
         << input_raster.ncols << " = " << input_raster.pixels.size() << '\n';
+
+    */
+
+    //minimum heap
+    std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
+    Raster d(3, 3);
+    d.fill();
+    d(0, 0) = 9; d(0, 1) = 8; d(0, 2) = 7;
+    d(1, 0) = 8; d(1, 1) = 7; d(1, 2) = 6;
+    d(2, 0) = 7; d(2, 1) = 6; d(2, 2) = 5;
+
+    //add the potential outlets: boundary, adding order: clockwise
+    add_outlets_boundary(d.nrows, d.ncols, d, cells_queue);
+        
+    while (!cells_queue.empty())
+    {
+        cout << cells_queue.top() << ' ';
+        cells_queue.pop();
+    } 
+
+    //Raster r(3, 3);
+    //r.fill();
+    //r(2, 2) = 1;
+    //std::cout<<r(2,2);
+
+    //RasterCell cella(0, 0, 20, 1), cellb(0, 0, 30, 2);
+    //std::cout << (cella < cellb);
     
     // Get Start Time
     //system_clock::time_point start = system_clock::now();
@@ -207,7 +228,7 @@ int main(int argc, const char* argv[])
     // to do
 
     // Close input dataset
-    GDALClose(input_dataset);
+    // GDALClose(input_dataset);
 
 	return 0;
 }

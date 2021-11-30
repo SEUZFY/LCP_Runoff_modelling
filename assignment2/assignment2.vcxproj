@@ -146,11 +146,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Direction.cpp" />
     <ClCompile Include="src\hw02.cpp" />
     <ClCompile Include="src\Raster.cpp" />
     <ClCompile Include="src\RasterCell.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Direction.h" />
     <ClInclude Include="src\Raster.h" />
     <ClInclude Include="src\RasterCell.h" />
   </ItemGroup>
