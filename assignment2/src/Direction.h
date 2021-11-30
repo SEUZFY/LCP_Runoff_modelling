@@ -14,5 +14,5 @@ int adjacent_pixel_types(const int& row, const int& col, const Raster& r);
 
 
 // Compute directions for each cell
-void compute_direction(Raster& r,
+void compute_direction(const int& row, const int& col, Raster& r,
 	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue);

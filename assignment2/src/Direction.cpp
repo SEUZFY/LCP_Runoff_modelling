@@ -54,8 +54,31 @@ int adjacent_pixel_types(const int& row, const int& col, const Raster& r)
 }
 
 
-void compute_direction(Raster& r, std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue)
+void compute_direction(const int& row, const int& col, Raster& r, 
+    std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue)
 {
-    //first identify the location of the pixel: boundary or not
+    int type(adjacent_pixel_types(row, col, r));
+
+    switch (type){
+    case 0:
+
+
+        break;
+    case 1:
+
+
+        break;
+    case 2:
+
+
+        break;
+    case 3:
+
+
+        break;
+    default:
+
+        break;
+    }
 
 }
