@@ -149,7 +149,7 @@ int main(int argc, const char* argv[])
 
     //minimum heap
     std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
-    Raster d(3, 3);
+    Raster d(3, 3), d1(3, 6);
     d.fill();
     d(0, 0) = 9; d(0, 1) = 8; d(0, 2) = 7;
     d(1, 0) = 8; d(1, 1) = 7; d(1, 2) = 6;
@@ -157,12 +157,24 @@ int main(int argc, const char* argv[])
 
     //add the potential outlets: boundary, adding order: clockwise
     add_outlets_boundary(d.nrows, d.ncols, d, cells_queue);
-        
+
+    //identify the adjacent pixel types
+    for (int i = 0; i < d1.nrows; ++i)
+    {
+        for (int j = 0; j < d1.ncols; ++j)
+            cout << adjacent_pixel_types(i, j, d1) << " ";
+        cout << '\n';
+    }
+    cout << '\n';
+    cout << adjacent_pixel_types(6, 6, d1);
+      
+    /*
     while (!cells_queue.empty())
     {
         cout << cells_queue.top() << ' ';
         cells_queue.pop();
     } 
+    */
 
     //Raster r(3, 3);
     //r.fill();
