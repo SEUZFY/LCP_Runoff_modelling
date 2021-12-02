@@ -159,22 +159,22 @@ int main(int argc, const char* argv[])
     add_outlets_boundary(d.nrows, d.ncols, d, cells_queue);
 
     //identify the adjacent pixel types
-    for (int i = 0; i < d1.nrows; ++i)
+    /*for (int i = 0; i < d1.nrows; ++i)
     {
         for (int j = 0; j < d1.ncols; ++j)
             cout << adjacent_pixel_types(i, j, d1) << " ";
         cout << '\n';
     }
     cout << '\n';
-    cout << adjacent_pixel_types(6, 6, d1);
+    cout << adjacent_pixel_types(6, 6, d1);*/
       
-    /*
+    
     while (!cells_queue.empty())
     {
         cout << cells_queue.top() << ' ';
         cells_queue.pop();
     } 
-    */
+    
 
     //Raster r(3, 3);
     //r.fill();

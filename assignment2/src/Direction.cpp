@@ -54,31 +54,48 @@ int adjacent_pixel_types(const int& row, const int& col, const Raster& r)
 }
 
 
-void compute_direction(const int& row, const int& col, Raster& r, 
+int compute_direction(const int& i, const int& j, Raster& r, 
     std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue)
 {
-    int type(adjacent_pixel_types(row, col, r));
-
-    switch (type){
-    case 0:
-
-
+    int type(adjacent_pixel_types(i, j, r));
+    double min(0); //maintain a double variable to get the steepest slope
+    int result(0);
+    switch (type){  
+    case 31: {
+        /*
+        clockwise
+        r(i, j + 1); East
+        r(i + 1, j + 1) * 0.707107; Southeast
+        r(i + 1, j); South
+        */
+        double e(r(i, j + 1)), se(r(i + 1, j + 1) * 0.707107),
+            s(r(i + 1, j));
+        min = (e < se) ? e : se;
+        min = min < s ? min : s;
+        if (min == e)result = 1;
+        if (min == se)result = 2;
+        if (min == s)result = 4;
         break;
-    case 1:
-
-
-        break;
-    case 2:
-
-
-        break;
-    case 3:
-
-
-        break;
-    default:
+    }
+    case 1: {
 
         break;
     }
+    
+    case 2: {
+        
+        break;
+    }
+   
+    case 3: {
+        
+        break;
+    }
+        
+    default:
 
+       
+        break;
+    }
+    return result;
 }

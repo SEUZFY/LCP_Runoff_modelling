@@ -5,6 +5,8 @@
 
 //Functions realted to compute flow directions.
 
+constexpr auto SCALE = 0.707107; // 1/(2^1/2);
+
 // add boundary pixels into priority_queue, cost: elevation, if same then insertion_order
 void add_outlets_boundary(int& Nrows, int& Ncols, const Raster& r,
 	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue);
@@ -13,6 +15,6 @@ void add_outlets_boundary(int& Nrows, int& Ncols, const Raster& r,
 int adjacent_pixel_types(const int& row, const int& col, const Raster& r);
 
 
-// Compute directions for each cell
-void compute_direction(const int& row, const int& col, Raster& r,
+// Compute directions for each cell, i: row, j: col and return the direction code
+int compute_direction(const int& i, const int& j, Raster& r,
 	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue);
