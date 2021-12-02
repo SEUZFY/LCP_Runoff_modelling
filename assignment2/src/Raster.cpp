@@ -1,6 +1,10 @@
 #include "Raster.h"
 #include <cassert>
 
+
+// Raster
+
+
 Raster::Raster(const int& rows, const int& cols)
     : nrows(rows), ncols(cols) {
     unsigned int total_pixels = rows * cols; //unsigned int for big size
@@ -32,4 +36,17 @@ void Raster::set_value(const int& row, const int& col, const int& value) {
     assert(row >= 0 && row < nrows);
     assert(col >= 0 && col < ncols);
     pixels[col + row * ncols] = value;
+}
+
+
+// RasterCell
+
+
+RasterCell::RasterCell(const int& c_row, const int& c_col, const int& elevation, const int& insertion_order)
+    :row(c_row), col(c_col), elevation(elevation), insertion_order(insertion_order) {}
+
+bool RasterCell::operator<(const RasterCell& other) const {
+    return ((other.elevation) < (this->elevation)) ||
+        ((other.elevation == this->elevation) && (other.insertion_order < this->insertion_order));
+    // insertion_order has to be unique;
 }

@@ -8,7 +8,6 @@
 #include "cpl_conv.h"
 
 #include "Raster.h"
-#include "RasterCell.h"
 #include "Direction.h"
 
 using std::cout;
@@ -30,6 +29,7 @@ std::ostream& operator<<(std::ostream& os, const RasterCell& c) {
         << ", col=" << c.col << "}";
     return os;
 }
+
 
 // Write the raster file to an .asc file
 void output_raster(const Raster& raster, const double& pixelsize, const double& topx, const double& topy)
@@ -167,9 +167,6 @@ int main(int argc, const char* argv[])
     }
     cout << '\n';
     cout << adjacent_pixel_types(6, 6, d1);*/
-    
-    int direc(compute_cell_direction(1, 0, d));
-    cout << direc << " " << '\n';
     
     while (!cells_queue.empty())
     {

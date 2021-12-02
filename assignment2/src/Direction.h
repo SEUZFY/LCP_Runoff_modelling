@@ -1,7 +1,6 @@
 #pragma once
 #include <queue>
 #include "Raster.h"
-#include "RasterCell.h"
 
 //Functions realted to compute flow directions.
 
@@ -13,7 +12,3 @@ void add_outlets_boundary(int& Nrows, int& Ncols, const Raster& r,
 
 // return the types(based on numbers) of adjacent pixels of the current pixel r(i,j)
 int adjacent_pixel_types(const int& row, const int& col, const Raster& r);
-
-
-// Compute directions for each cell, i: row, j: col and return the direction code
-int  compute_cell_direction(const int& i, const int& j, Raster& r);

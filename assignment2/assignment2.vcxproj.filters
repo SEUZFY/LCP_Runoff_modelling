@@ -21,18 +21,12 @@
     <ClCompile Include="src\Raster.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\RasterCell.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\Direction.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Raster.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="src\RasterCell.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\Direction.h">
