@@ -167,7 +167,9 @@ int main(int argc, const char* argv[])
     }
     cout << '\n';
     cout << adjacent_pixel_types(6, 6, d1);*/
-      
+    
+    int direc(compute_cell_direction(1, 0, d));
+    cout << direc << " " << '\n';
     
     while (!cells_queue.empty())
     {
