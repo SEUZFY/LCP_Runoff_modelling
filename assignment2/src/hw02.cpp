@@ -174,7 +174,17 @@ int main(int argc, const char* argv[])
         cout << cells_queue.top() << ' ';
         cells_queue.pop();
     } 
-    cout << insert;
+    cout << insert << '\n';
+
+    std::vector<RasterCell> ProcessRaster; //Initialize the process raster with the original raster
+    ProcessRaster.reserve(d.nrows * d.ncols);
+    for (int i = 0; i < d.nrows; ++i) {
+        for (int j = 0; j < d.ncols; ++j) {
+            ProcessRaster.push_back(RasterCell(i, j, d(i, j),0));
+        }
+    }
+
+    cout << ProcessRaster[1].visited;
     
 
     //Raster r(3, 3);
