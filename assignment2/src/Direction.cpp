@@ -2,10 +2,10 @@
 #include "Raster.h"
 #include "Direction.h"
 
+
 void add_outlets_boundary(int& Nrows, int& Ncols, const Raster& r,
-	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue)
+	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order)
 {
-    int order(0);
     for (int j = 0; j != Ncols; ++j) {
         order += 1;
         myqueue.push(RasterCell(0, j, r(0, j), order)); //top
@@ -50,5 +50,25 @@ int adjacent_pixel_types(const int& row, const int& col, const Raster& r)
 
     //each cell has 8 adjacent pixels
     return 8; 
+}
+
+void add_neighbours(int& i, int& j, Raster& r, 
+    std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order)
+{
+    int loc(adjacent_pixel_types(i, j, r)); // get the location of the processing cell
+    switch (loc)
+    {
+    case 31: {
+        
+
+    } // up-left corner
+
+
+
+    default: // loc = 0 outside of the boundary
+        break;
+    }
+
+
 }
 

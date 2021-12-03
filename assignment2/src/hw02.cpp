@@ -156,7 +156,8 @@ int main(int argc, const char* argv[])
     d(2, 0) = 7; d(2, 1) = 6; d(2, 2) = 5;
 
     //add the potential outlets: boundary, adding order: clockwise
-    add_outlets_boundary(d.nrows, d.ncols, d, cells_queue);
+    int insert(0);
+    add_outlets_boundary(d.nrows, d.ncols, d, cells_queue,insert);
 
     //identify the adjacent pixel types
     /*for (int i = 0; i < d1.nrows; ++i)
@@ -173,6 +174,7 @@ int main(int argc, const char* argv[])
         cout << cells_queue.top() << ' ';
         cells_queue.pop();
     } 
+    cout << insert;
     
 
     //Raster r(3, 3);
