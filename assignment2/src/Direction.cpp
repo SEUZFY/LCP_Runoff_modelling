@@ -40,16 +40,16 @@ int adjacent_pixel_types(const int& row, const int& col, const int& Nrows, const
     if (row > (Nrows - 1) || col > (Ncols - 1) || row < 0 || col < 0)return 0; //if index is inappropriate
 
     // each cell has 3 adjacent pixels, encoding order: clockwise(1-2-3-4)
-    if (row == col && row == 0)return 31; //up-left 
-    if (row == 0 && col == (Ncols - 1))return 32; //up-right
-    if (row == (Nrows - 1) && col == (Ncols - 1))return 33; //low-right
-    if (row == (Nrows - 1) && col == 0)return 34; //low-left
+    else if (row == col && row == 0)return 31; //up-left 
+    else if (row == 0 && col == (Ncols - 1))return 32; //up-right
+    else if (row == (Nrows - 1) && col == (Ncols - 1))return 33; //low-right
+    else if (row == (Nrows - 1) && col == 0)return 34; //low-left
 
     // each cell has 5 adjacent pixels
-    if (row == 0 && col > 0 && col < (Ncols - 1))return 51; //top row
-    if (col == Ncols - 1 && row > 0 && row < (Nrows - 1))return 52; //rightmost row
-    if (row == (Nrows - 1) && col > 0 && col < (Ncols - 1))return 53; //bottom row
-    if (col == 0 && row > 0 && row < (Nrows - 1))return 54; //leftmost row
+    else if (row == 0 && col > 0 && col < (Ncols - 1))return 51; //top row
+    else if (col == Ncols - 1 && row > 0 && row < (Nrows - 1))return 52; //rightmost row
+    else if (row == (Nrows - 1) && col > 0 && col < (Ncols - 1))return 53; //bottom row
+    else if (col == 0 && row > 0 && row < (Nrows - 1))return 54; //leftmost row
 
     //each cell has 8 adjacent pixels
     return 8; 
@@ -239,7 +239,145 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
         break;
     } // rightmost row
 
+    case 53: {
+        if (r(i, j - 1).listed == false && r(i, j - 1).visited == false)
+        {
+            r(i, j - 1).insertion_order = ++order;
+            r(i, j - 1).listed = true;
+            myqueue.emplace(r(i, j - 1));
+        } //left neighbour
 
+        if (r(i - 1, j - 1).listed == false && r(i - 1, j - 1).visited == false)
+        {
+            r(i - 1, j - 1).insertion_order = ++order;
+            r(i - 1, j - 1).listed = true;
+            myqueue.emplace(r(i - 1, j - 1));
+        } //diagonal neighbour
+
+        if (r(i - 1, j).listed == false && r(i - 1, j).visited == false)
+        {
+            r(i - 1, j).insertion_order = ++order;
+            r(i - 1, j).listed = true;
+            myqueue.emplace(r(i - 1, j));
+        } //top neighbour
+
+        if (r(i - 1, j + 1).listed == false && r(i - 1, j + 1).visited == false)
+        {
+            r(i - 1, j + 1).insertion_order = ++order;
+            r(i - 1, j + 1).listed = true;
+            myqueue.emplace(r(i - 1, j + 1));
+        } //diagonal neighbour
+
+        if (r(i, j + 1).listed == false && r(i, j + 1).visited == false)
+        {
+            r(i, j + 1).insertion_order = ++order;
+            r(i, j + 1).listed = true;
+            myqueue.emplace(r(i, j + 1));
+        } //right neighbour
+
+        break;
+    } //bottom row
+
+    case 54: {
+        if (r(i - 1, j).listed == false && r(i - 1, j).visited == false)
+        {
+            r(i - 1, j).insertion_order = ++order;
+            r(i - 1, j).listed = true;
+            myqueue.emplace(r(i - 1, j));
+        } //top neighbour
+
+        if (r(i - 1, j + 1).listed == false && r(i - 1, j + 1).visited == false)
+        {
+            r(i - 1, j + 1).insertion_order = ++order;
+            r(i - 1, j + 1).listed = true;
+            myqueue.emplace(r(i - 1, j + 1));
+        } //diagonal neighbour
+
+        if (r(i, j + 1).listed == false && r(i, j + 1).visited == false)
+        {
+            r(i, j + 1).insertion_order = ++order;
+            r(i, j + 1).listed = true;
+            myqueue.emplace(r(i, j + 1));
+        } //right neighbour
+
+        if (r(i + 1, j + 1).listed == false && r(i + 1, j + 1).visited == false)
+        {
+            r(i + 1, j + 1).insertion_order = ++order;
+            r(i + 1, j + 1).listed = true;
+            myqueue.emplace(r(i + 1, j + 1));
+        } //diagonal neighbour
+
+        if (r(i + 1, j).listed == false && r(i + 1, j).visited == false)
+        {
+            r(i + 1, j).insertion_order = ++order;
+            r(i + 1, j).listed = true;
+            myqueue.emplace(r(i + 1, j));
+        } //bottom neighbour
+
+        break;
+    } //leftmost row
+
+    case 8: {
+        if (r(i - 1, j - 1).listed == false && r(i - 1, j - 1).visited == false)
+        {
+            r(i - 1, j - 1).insertion_order = ++order;
+            r(i - 1, j - 1).listed = true;
+            myqueue.emplace(r(i - 1, j - 1));
+        } //diagonal neighbour
+
+        if (r(i - 1, j).listed == false && r(i - 1, j).visited == false)
+        {
+            r(i - 1, j).insertion_order = ++order;
+            r(i - 1, j).listed = true;
+            myqueue.emplace(r(i - 1, j));
+        } //top neighbour
+
+        if (r(i - 1, j + 1).listed == false && r(i - 1, j + 1).visited == false)
+        {
+            r(i - 1, j + 1).insertion_order = ++order;
+            r(i - 1, j + 1).listed = true;
+            myqueue.emplace(r(i - 1, j + 1));
+        } //diagonal neighbour
+
+        if (r(i, j + 1).listed == false && r(i, j + 1).visited == false)
+        {
+            r(i, j + 1).insertion_order = ++order;
+            r(i, j + 1).listed = true;
+            myqueue.emplace(r(i, j + 1));
+        } //right neighbour
+
+        if (r(i + 1, j + 1).listed == false && r(i + 1, j + 1).visited == false)
+        {
+            r(i + 1, j + 1).insertion_order = ++order;
+            r(i + 1, j + 1).listed = true;
+            myqueue.emplace(r(i + 1, j + 1));
+        } //diagonal neighbour
+
+        if (r(i + 1, j).listed == false && r(i + 1, j).visited == false)
+        {
+            r(i + 1, j).insertion_order = ++order;
+            r(i + 1, j).listed = true;
+            myqueue.emplace(r(i + 1, j));
+        } //bottom neighbour
+
+        if (r(i + 1, j - 1).listed == false && r(i + 1, j - 1).visited == false)
+        {
+            r(i + 1, j - 1).insertion_order = ++order;
+            r(i + 1, j - 1).listed = true;
+            myqueue.emplace(r(i + 1, j - 1));
+        } //diagonal neighbour
+
+        if (r(i, j - 1).listed == false && r(i, j - 1).visited == false)
+        {
+            r(i, j - 1).insertion_order = ++order;
+            r(i, j - 1).listed = true;
+            myqueue.emplace(r(i, j - 1));
+        } //left neighbour
+
+        break;
+    } // cells with 8 neighbours
+
+    //case clauses can be merged
 
     default: // loc = 0 outside of the boundary
         break;

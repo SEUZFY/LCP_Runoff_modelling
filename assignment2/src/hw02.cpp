@@ -179,7 +179,7 @@ int main(int argc, const char* argv[])
 
     cout << "\n";
 
-    add_neighbours(1, 2, flow_direction, cells_queue, insert);
+    add_neighbours(1, 1, flow_direction, cells_queue, insert);
 
     //identify the adjacent pixel types
     /*for (int i = 0; i < d1.nrows; ++i)
