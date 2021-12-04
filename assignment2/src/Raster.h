@@ -35,7 +35,7 @@ struct RasterCell {
     int insertion_order;
     bool visited; // if not yet visited: false, once visited: true
     bool listed; // if not yet been added to the list: false, once added: true
-    int direct; // direction of current cell, initialized with 0
+    int direction; // direction of current cell, initialized with 0
 
     // Defines a new link to a cell
     RasterCell(const int& c_row, const int& c_col, const int& elevation);

@@ -55,6 +55,7 @@ int adjacent_pixel_types(const int& row, const int& col, const int& Nrows, const
     return 8; 
 }
 
+
 void add_neighbours(const int& i, const int& j, ProRaster& r, 
     std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order)
 {
@@ -384,5 +385,20 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
     }
 
 
+}
+
+
+void compute_flow_direction(ProRaster& r, 
+    std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue)
+{
+    while (!myqueue.empty())
+    {
+        int i(myqueue.top().row), j(myqueue.top().col); //row and col of processing cell
+        r(i, j).visited = true; // current cell: visited = true
+        
+        //set directions of its neighbours
+        //r(i+1,j+1).direction = 1/2/4/.../128
+        myqueue.pop();
+    }
 }
 

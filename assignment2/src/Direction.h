@@ -14,3 +14,7 @@ int adjacent_pixel_types(const int& row, const int& col, const int& Nrows, const
 // add neighbours of the processing cell to the priority queue
 void add_neighbours(const int& i, const int& j, ProRaster& r,
 	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order);
+
+// compute every direction of each cell
+void compute_flow_direction(ProRaster& r,
+	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue);

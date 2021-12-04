@@ -161,25 +161,28 @@ int main(int argc, const char* argv[])
     ProRaster flow_direction(3, 3);
     flow_direction.fill_proraster(d);
 
-    for (int i = 0; i < flow_direction.nrows; ++i)
-    {
-        for (int j = 0; j < flow_direction.ncols; ++j)
-            cout << flow_direction(i,j).insertion_order << " ";
-        cout << '\n';
-    }  
-
     //add the potential outlets: boundary, adding order: clockwise
     add_outlets_boundary(d.nrows, d.ncols, flow_direction, cells_queue,insert);
+
     for (int i = 0; i < flow_direction.nrows; ++i)
     {
         for (int j = 0; j < flow_direction.ncols; ++j)
-            cout << flow_direction(i, j).insertion_order << " ";
+            cout << flow_direction(i, j).visited << " ";
+        cout << '\n';
+    }
+
+    compute_flow_direction(flow_direction, cells_queue);
+
+    for (int i = 0; i < flow_direction.nrows; ++i)
+    {
+        for (int j = 0; j < flow_direction.ncols; ++j)
+            cout << flow_direction(i, j).visited << " ";
         cout << '\n';
     }
 
     cout << "\n";
 
-    add_neighbours(1, 1, flow_direction, cells_queue, insert);
+    //add_neighbours(1, 1, flow_direction, cells_queue, insert);
 
     //identify the adjacent pixel types
     /*for (int i = 0; i < d1.nrows; ++i)
@@ -191,13 +194,7 @@ int main(int argc, const char* argv[])
     cout << '\n';
     cout << adjacent_pixel_types(6, 6, d1);*/
     
-    while (!cells_queue.empty())
-    {
-        cout << cells_queue.top()<< ' ';
-        //current cell: visited==true
-        //set directions of its neighbours
-        cells_queue.pop();
-    } 
+    
     cout << insert << '\n';
 
    
