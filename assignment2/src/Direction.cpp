@@ -3,7 +3,7 @@
 #include "Direction.h"
 
 
-void add_outlets_boundary(int& Nrows, int& Ncols, ProRaster& r,
+void add_outlets_boundary(const int& Nrows, const int& Ncols, ProRaster& r,
 	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order)
 {
     for (int j = 0; j != Ncols; ++j) {
@@ -56,7 +56,7 @@ int adjacent_pixel_types(const int& row, const int& col, ProRaster& r)
     return 8; 
 }
 
-void add_neighbours(int& i, int& j, ProRaster& r, 
+void add_neighbours(const int& i, const int& j, ProRaster& r, 
     std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order)
 {
     int loc(adjacent_pixel_types(i, j, r)); // get the location of the processing cell
@@ -77,8 +77,13 @@ void add_neighbours(int& i, int& j, ProRaster& r,
             myqueue.push(r(i + 1, j + 1));
         }// diagonal neighbour
 
-
-        
+        if (r(i + 1, j).listed == false && r(i + 1, j).visited == false)
+        {
+            r(i + 1, j).insertion_order = ++order;
+            r(i + 1, j).listed = true;
+            myqueue.push(r(i + 1, j));
+        }// diagonal neighbour
+      
         break;
     } // up-left corner
 
