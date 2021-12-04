@@ -27,9 +27,7 @@ struct Raster {
 
 };
 
-
 // A structure that links to a single cell in a Raster
-
 
 struct RasterCell {
     int row, col; // row and column of the cell
@@ -44,4 +42,20 @@ struct RasterCell {
 
     // Define the order of the linked cells (to be used in a priority_queue)
     bool operator<(const RasterCell& other) const;
+};
+
+// A structure that represents the Raster with RasterCells 
+
+struct ProRaster {
+    std::vector<RasterCell> propixels;
+    int nrows, ncols; // number of rows and cols
+
+    // Initialise a raster with rows and cols
+    ProRaster(const int& rows, const int& cols);
+
+    // Initialise the proraster with raster
+    void fill_proraster(const Raster& r);
+
+    // Access the value of a raster cell to read or write it
+    RasterCell& operator()(const int& row, const int& col);
 };

@@ -155,10 +155,29 @@ int main(int argc, const char* argv[])
     d(1, 0) = 8; d(1, 1) = 7; d(1, 2) = 6;
     d(2, 0) = 7; d(2, 1) = 6; d(2, 2) = 5;
 
-    //add the potential outlets: boundary, adding order: clockwise
+    // insert: global variable, standing for the insertion order
     int insert(0);
-    add_outlets_boundary(d.nrows, d.ncols, d, cells_queue,insert);
 
+    ProRaster flow_direction(3, 3);
+    flow_direction.fill_proraster(d);
+
+    for (int i = 0; i < flow_direction.nrows; ++i)
+    {
+        for (int j = 0; j < flow_direction.ncols; ++j)
+            cout << flow_direction(i,j).insertion_order << " ";
+        cout << '\n';
+    }  
+
+    //add the potential outlets: boundary, adding order: clockwise
+    add_outlets_boundary(d.nrows, d.ncols, flow_direction, cells_queue,insert);
+    for (int i = 0; i < flow_direction.nrows; ++i)
+    {
+        for (int j = 0; j < flow_direction.ncols; ++j)
+            cout << flow_direction(i, j).insertion_order << " ";
+        cout << '\n';
+    }
+
+    cout << "\n";
     //identify the adjacent pixel types
     /*for (int i = 0; i < d1.nrows; ++i)
     {
@@ -171,20 +190,12 @@ int main(int argc, const char* argv[])
     
     while (!cells_queue.empty())
     {
-        cout << cells_queue.top() << ' ';
+        cout << cells_queue.top()<< ' ';
         cells_queue.pop();
     } 
     cout << insert << '\n';
 
-    std::vector<RasterCell> ProcessRaster; //Initialize the process raster with the original raster
-    ProcessRaster.reserve(d.nrows * d.ncols);
-    for (int i = 0; i < d.nrows; ++i) {
-        for (int j = 0; j < d.ncols; ++j) {
-            ProcessRaster.push_back(RasterCell(i, j, d(i, j),0));
-        }
-    }
-
-    cout << ProcessRaster[1].visited;
+   
     
 
     //Raster r(3, 3);

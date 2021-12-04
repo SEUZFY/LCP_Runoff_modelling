@@ -3,24 +3,32 @@
 #include "Direction.h"
 
 
-void add_outlets_boundary(int& Nrows, int& Ncols, const Raster& r,
+void add_outlets_boundary(int& Nrows, int& Ncols, ProRaster& r,
 	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order)
 {
     for (int j = 0; j != Ncols; ++j) {
         order += 1;
-        myqueue.push(RasterCell(0, j, r(0, j), order)); //top
+        r(0, j).insertion_order = order;
+        r(0, j).listed = true;
+        myqueue.push(r(0, j)); //top
     }
     for (int i = 1; i != Nrows; ++i) {
         order += 1;
-       myqueue.push(RasterCell(i, Ncols - 1, r(i, Ncols - 1), order)); //rightmost
+        r(i, Ncols - 1).insertion_order = order;
+        r(i, Ncols - 1).listed = true;
+        myqueue.push(r(i, Ncols - 1)); //rightmost
     }
     for (int j = Ncols - 2; j != -1; --j) {
         order += 1;
-        myqueue.push(RasterCell(Nrows - 1, j, r(Nrows - 1, j), order)); //bottom
+        r(Nrows - 1, j).insertion_order = order;
+        r(Nrows - 1, j).listed = true;
+        myqueue.push(r(Nrows - 1, j)); //bottom
     }
     for (int i = Nrows - 2; i != 0; --i) {
         order += 1;
-        myqueue.push(RasterCell(i, 0, r(i, 0), order)); //leftmost
+        r(i, 0).insertion_order = order;
+        r(i, 0).listed = true;
+        myqueue.push(r(i, 0)); //leftmost
     }
 }
 
