@@ -29,7 +29,7 @@ void add_outlets_boundary(const int& Nrows, const int& Ncols, ProRaster& r,
 }
 
 
-int adjacent_pixel_types(const int& row, const int& col, ProRaster& r)
+int adjacent_pixel_types(const int& row, const int& col, const int& Nrows, const int& Ncols)
 {
     /*
     possible adjacent pixel numbers: 3,5,8
@@ -37,8 +37,7 @@ int adjacent_pixel_types(const int& row, const int& col, ProRaster& r)
     based on the numbers, specify the types
     */
     
-    if (row > (r.nrows - 1) || col > (r.ncols - 1))return 0; //if index is inappropriate
-    int Nrows(r.nrows), Ncols(r.ncols);
+    if (row > (Nrows - 1) || col > (Ncols - 1) || row < 0 || col < 0)return 0; //if index is inappropriate
 
     // each cell has 3 adjacent pixels, encoding order: clockwise(1-2-3-4)
     if (row == col && row == 0)return 31; //up-left 
@@ -59,9 +58,9 @@ int adjacent_pixel_types(const int& row, const int& col, ProRaster& r)
 void add_neighbours(const int& i, const int& j, ProRaster& r, 
     std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order)
 {
-    int loc(adjacent_pixel_types(i, j, r)); // get the location of the processing cell
-    switch (loc)
-    {
+    int loc(adjacent_pixel_types(i, j, r.nrows, r.ncols)); // get the location of the processing cell
+    switch (loc){
+    
     case 31: {
         if (r(i, j + 1).listed == false && r(i, j + 1).visited == false)
         {
@@ -85,9 +84,57 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
         }// diagonal neighbour
       
         break;
-    } // up-left corner
+    } //up-left corner
 
+    case 32: {
+        if (r(i + 1, j).listed == false && r(i + 1, j).visited == false)
+        {
+            r(i + 1, j).insertion_order = ++order;
+            r(i + 1, j).listed = true;
+            myqueue.push(r(i + 1, j));
+        }// bottom neighbour
 
+        if (r(i + 1, j - 1).listed == false && r(i + 1, j - 1).visited == false)
+        {
+            r(i + 1, j - 1).insertion_order = ++order;
+            r(i + 1, j - 1).listed = true;
+            myqueue.push(r(i + 1, j - 1));
+        }// diagonal neighbour
+
+        if (r(i, j - 1).listed == false && r(i, j - 1).visited == false)
+        {
+            r(i, j - 1).insertion_order = ++order;
+            r(i, j - 1).listed = true;
+            myqueue.push(r(i, j - 1));
+        }// left neighbour
+
+        break;
+    } //up-right corner
+
+    case 33: {
+        if (r(i, j - 1).listed == false && r(i, j - 1).visited == false)
+        {
+            r(i, j - 1).insertion_order = ++order;
+            r(i, j - 1).listed = true;
+            myqueue.push(r(i, j - 1));
+        }// left neighbour
+
+        if (r(i - 1, j - 1).listed == false && r(i - 1, j - 1).visited == false)
+        {
+            r(i - 1, j - 1).insertion_order = ++order;
+            r(i - 1, j - 1).listed = true;
+            myqueue.push(r(i - 1, j - 1));
+        }// diagonal neighbour
+
+        if (r(i - 1, j).listed == false && r(i - 1, j).visited == false)
+        {
+            r(i - 1, j).insertion_order = ++order;
+            r(i - 1, j).listed = true;
+            myqueue.push(r(i - 1, j));
+        }// top neighbour
+
+        break;
+    } // low-right corner
 
     default: // loc = 0 outside of the boundary
         break;
