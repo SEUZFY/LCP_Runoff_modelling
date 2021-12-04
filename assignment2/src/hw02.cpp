@@ -179,7 +179,7 @@ int main(int argc, const char* argv[])
 
     cout << "\n";
 
-    add_neighbours(2, 2, flow_direction, cells_queue, insert);
+    add_neighbours(1, 2, flow_direction, cells_queue, insert);
 
     //identify the adjacent pixel types
     /*for (int i = 0; i < d1.nrows; ++i)
@@ -194,6 +194,8 @@ int main(int argc, const char* argv[])
     while (!cells_queue.empty())
     {
         cout << cells_queue.top()<< ' ';
+        //current cell: visited==true
+        //set directions of its neighbours
         cells_queue.pop();
     } 
     cout << insert << '\n';

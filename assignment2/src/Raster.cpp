@@ -38,8 +38,8 @@ void Raster::set_value(const int& row, const int& col, const int& value) {
 
 // RasterCell
 
-RasterCell::RasterCell(const int& c_row, const int& c_col, const int& elevation, const int& insertion)
-    :row(c_row), col(c_col), elevation(elevation), insertion_order(insertion),
+RasterCell::RasterCell(const int& c_row, const int& c_col, const int& elevation)
+    :row(c_row), col(c_col), elevation(elevation), insertion_order(0),
     visited(false), listed(false), direct(0) {}
 
 bool RasterCell::operator<(const RasterCell& other) const {
@@ -60,7 +60,7 @@ void ProRaster::fill_proraster(const Raster& r)
 {
     for (int i = 0; i < r.nrows; ++i) {
         for (int j = 0; j < r.ncols; ++j) {
-            propixels.emplace_back(RasterCell(i, j, r(i, j), 0));
+            propixels.emplace_back(RasterCell(i, j, r(i, j)));
         }
     }
 }

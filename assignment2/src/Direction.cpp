@@ -9,22 +9,22 @@ void add_outlets_boundary(const int& Nrows, const int& Ncols, ProRaster& r,
     for (int j = 0; j != Ncols; ++j) {
         r(0, j).insertion_order = ++order;
         r(0, j).listed = true;
-        myqueue.push(r(0, j)); //top
+        myqueue.emplace(r(0, j)); //top
     }
     for (int i = 1; i != Nrows; ++i) {
         r(i, Ncols - 1).insertion_order = ++order;
         r(i, Ncols - 1).listed = true;
-        myqueue.push(r(i, Ncols - 1)); //rightmost
+        myqueue.emplace(r(i, Ncols - 1)); //rightmost
     }
     for (int j = Ncols - 2; j != -1; --j) {
         r(Nrows - 1, j).insertion_order = ++order;
         r(Nrows - 1, j).listed = true;
-        myqueue.push(r(Nrows - 1, j)); //bottom
+        myqueue.emplace(r(Nrows - 1, j)); //bottom
     }
     for (int i = Nrows - 2; i != 0; --i) {
         r(i, 0).insertion_order = ++order;
         r(i, 0).listed = true;
-        myqueue.push(r(i, 0)); //leftmost
+        myqueue.emplace(r(i, 0)); //leftmost
     }
 }
 
@@ -66,21 +66,21 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
         {
             r(i, j + 1).insertion_order = ++order;
             r(i, j + 1).listed = true;
-            myqueue.push(r(i, j + 1));
+            myqueue.emplace(r(i, j + 1));
         }// right neighbour
 
         if (r(i + 1, j + 1).listed == false && r(i + 1, j + 1).visited == false)
         {
             r(i + 1, j + 1).insertion_order = ++order;
             r(i + 1, j + 1).listed = true;
-            myqueue.push(r(i + 1, j + 1));
+            myqueue.emplace(r(i + 1, j + 1));
         }// diagonal neighbour
 
         if (r(i + 1, j).listed == false && r(i + 1, j).visited == false)
         {
             r(i + 1, j).insertion_order = ++order;
             r(i + 1, j).listed = true;
-            myqueue.push(r(i + 1, j));
+            myqueue.emplace(r(i + 1, j));
         }// diagonal neighbour
       
         break;
@@ -91,21 +91,21 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
         {
             r(i + 1, j).insertion_order = ++order;
             r(i + 1, j).listed = true;
-            myqueue.push(r(i + 1, j));
+            myqueue.emplace(r(i + 1, j));
         }// bottom neighbour
 
         if (r(i + 1, j - 1).listed == false && r(i + 1, j - 1).visited == false)
         {
             r(i + 1, j - 1).insertion_order = ++order;
             r(i + 1, j - 1).listed = true;
-            myqueue.push(r(i + 1, j - 1));
+            myqueue.emplace(r(i + 1, j - 1));
         }// diagonal neighbour
 
         if (r(i, j - 1).listed == false && r(i, j - 1).visited == false)
         {
             r(i, j - 1).insertion_order = ++order;
             r(i, j - 1).listed = true;
-            myqueue.push(r(i, j - 1));
+            myqueue.emplace(r(i, j - 1));
         }// left neighbour
 
         break;
@@ -116,25 +116,130 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
         {
             r(i, j - 1).insertion_order = ++order;
             r(i, j - 1).listed = true;
-            myqueue.push(r(i, j - 1));
+            myqueue.emplace(r(i, j - 1));
         }// left neighbour
 
         if (r(i - 1, j - 1).listed == false && r(i - 1, j - 1).visited == false)
         {
             r(i - 1, j - 1).insertion_order = ++order;
             r(i - 1, j - 1).listed = true;
-            myqueue.push(r(i - 1, j - 1));
+            myqueue.emplace(r(i - 1, j - 1));
         }// diagonal neighbour
 
         if (r(i - 1, j).listed == false && r(i - 1, j).visited == false)
         {
             r(i - 1, j).insertion_order = ++order;
             r(i - 1, j).listed = true;
-            myqueue.push(r(i - 1, j));
+            myqueue.emplace(r(i - 1, j));
         }// top neighbour
 
         break;
     } // low-right corner
+
+    case 34: {
+        if (r(i - 1, j).listed == false && r(i - 1, j).visited == false)
+        {
+            r(i - 1, j).insertion_order = ++order;
+            r(i - 1, j).listed = true;
+            myqueue.emplace(r(i - 1, j));
+        }// top neighbour
+
+        if (r(i - 1, j + 1).listed == false && r(i - 1, j + 1).visited == false)
+        {
+            r(i - 1, j + 1).insertion_order = ++order;
+            r(i - 1, j + 1).listed = true;
+            myqueue.emplace(r(i - 1, j + 1));
+        }// diagonal neighbour
+
+        if (r(i, j + 1).listed == false && r(i, j + 1).visited == false)
+        {
+            r(i, j + 1).insertion_order = ++order;
+            r(i, j + 1).listed = true;
+            myqueue.emplace(r(i, j + 1));
+        }// right neighbour
+
+        break;
+    } // low-left corner
+
+    case 51: {
+        if (r(i, j + 1).listed == false && r(i, j + 1).visited == false)
+        {
+            r(i, j + 1).insertion_order = ++order;
+            r(i, j + 1).listed = true;
+            myqueue.emplace(r(i, j + 1));
+        }// right neighbour
+
+        if (r(i + 1, j + 1).listed == false && r(i + 1, j + 1).visited == false)
+        {
+            r(i + 1, j + 1).insertion_order = ++order;
+            r(i + 1, j + 1).listed = true;
+            myqueue.emplace(r(i + 1, j + 1));
+        }// diagonal neighbour
+
+        if (r(i + 1, j).listed == false && r(i + 1, j).visited == false)
+        {
+            r(i + 1, j).insertion_order = ++order;
+            r(i + 1, j).listed = true;
+            myqueue.emplace(r(i + 1, j));
+        }// bottom neighbour
+
+        if (r(i + 1, j - 1).listed == false && r(i + 1, j - 1).visited == false)
+        {
+            r(i + 1, j - 1).insertion_order = ++order;
+            r(i + 1, j - 1).listed = true;
+            myqueue.emplace(r(i + 1, j - 1));
+        }// diagonal neighbour
+
+        if (r(i, j - 1).listed == false && r(i, j - 1).visited == false)
+        {
+            r(i, j - 1).insertion_order = ++order;
+            r(i, j - 1).listed = true;
+            myqueue.emplace(r(i, j - 1));
+        }// left neighbour
+
+        break;
+    } // top row
+
+    case 52: {
+        if (r(i + 1, j).listed == false && r(i + 1, j).visited == false)
+        {
+            r(i + 1, j).insertion_order = ++order;
+            r(i + 1, j).listed = true;
+            myqueue.emplace(r(i + 1, j));
+        }// bottom neighbour
+
+        if (r(i + 1, j - 1).listed == false && r(i + 1, j - 1).visited == false)
+        {
+            r(i + 1, j - 1).insertion_order = ++order;
+            r(i + 1, j - 1).listed = true;
+            myqueue.emplace(r(i + 1, j - 1));
+        }// diagonal neighbour
+
+        if (r(i, j - 1).listed == false && r(i, j - 1).visited == false)
+        {
+            r(i, j - 1).insertion_order = ++order;
+            r(i, j - 1).listed = true;
+            myqueue.emplace(r(i, j - 1));
+        }// left neighbour
+
+        if (r(i - 1, j - 1).listed == false && r(i - 1, j - 1).visited == false)
+        {
+            r(i - 1, j - 1).insertion_order = ++order;
+            r(i - 1, j - 1).listed = true;
+            myqueue.emplace(r(i - 1, j - 1));
+        }// diagonal neighbour
+
+        if (r(i - 1, j).listed == false && r(i - 1, j).visited == false)
+        {
+            r(i - 1, j).insertion_order = ++order;
+            r(i - 1, j).listed = true;
+            myqueue.emplace(r(i - 1, j));
+        }// top neighbour
+
+        break;
+    } // rightmost row
+
+
 
     default: // loc = 0 outside of the boundary
         break;
