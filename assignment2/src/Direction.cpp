@@ -7,33 +7,29 @@ void add_outlets_boundary(int& Nrows, int& Ncols, ProRaster& r,
 	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order)
 {
     for (int j = 0; j != Ncols; ++j) {
-        order += 1;
-        r(0, j).insertion_order = order;
+        r(0, j).insertion_order = ++order;
         r(0, j).listed = true;
         myqueue.push(r(0, j)); //top
     }
     for (int i = 1; i != Nrows; ++i) {
-        order += 1;
-        r(i, Ncols - 1).insertion_order = order;
+        r(i, Ncols - 1).insertion_order = ++order;
         r(i, Ncols - 1).listed = true;
         myqueue.push(r(i, Ncols - 1)); //rightmost
     }
     for (int j = Ncols - 2; j != -1; --j) {
-        order += 1;
-        r(Nrows - 1, j).insertion_order = order;
+        r(Nrows - 1, j).insertion_order = ++order;
         r(Nrows - 1, j).listed = true;
         myqueue.push(r(Nrows - 1, j)); //bottom
     }
     for (int i = Nrows - 2; i != 0; --i) {
-        order += 1;
-        r(i, 0).insertion_order = order;
+        r(i, 0).insertion_order = ++order;
         r(i, 0).listed = true;
         myqueue.push(r(i, 0)); //leftmost
     }
 }
 
 
-int adjacent_pixel_types(const int& row, const int& col, const Raster& r)
+int adjacent_pixel_types(const int& row, const int& col, ProRaster& r)
 {
     /*
     possible adjacent pixel numbers: 3,5,8
@@ -60,15 +56,30 @@ int adjacent_pixel_types(const int& row, const int& col, const Raster& r)
     return 8; 
 }
 
-void add_neighbours(int& i, int& j, Raster& r, 
+void add_neighbours(int& i, int& j, ProRaster& r, 
     std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order)
 {
     int loc(adjacent_pixel_types(i, j, r)); // get the location of the processing cell
     switch (loc)
     {
     case 31: {
-        
+        if (r(i, j + 1).listed == false && r(i, j + 1).visited == false)
+        {
+            r(i, j + 1).insertion_order = ++order;
+            r(i, j + 1).listed = true;
+            myqueue.push(r(i, j + 1));
+        }// right neighbour
 
+        if (r(i + 1, j + 1).listed == false && r(i + 1, j + 1).visited == false)
+        {
+            r(i + 1, j + 1).insertion_order = ++order;
+            r(i + 1, j + 1).listed = true;
+            myqueue.push(r(i + 1, j + 1));
+        }// diagonal neighbour
+
+
+        
+        break;
     } // up-left corner
 
 

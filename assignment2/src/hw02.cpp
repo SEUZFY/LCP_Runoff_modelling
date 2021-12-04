@@ -152,7 +152,7 @@ int main(int argc, const char* argv[])
     Raster d(3, 3), d1(3, 6);
     d.fill();
     d(0, 0) = 9; d(0, 1) = 8; d(0, 2) = 7;
-    d(1, 0) = 8; d(1, 1) = 7; d(1, 2) = 6;
+    d(1, 0) = 5; d(1, 1) = 7; d(1, 2) = 6;
     d(2, 0) = 7; d(2, 1) = 6; d(2, 2) = 5;
 
     // insert: global variable, standing for the insertion order
@@ -178,6 +178,10 @@ int main(int argc, const char* argv[])
     }
 
     cout << "\n";
+
+    flow_direction(1, 1).insertion_order = ++insert;
+    cells_queue.push(flow_direction(1, 1));
+
     //identify the adjacent pixel types
     /*for (int i = 0; i < d1.nrows; ++i)
     {
