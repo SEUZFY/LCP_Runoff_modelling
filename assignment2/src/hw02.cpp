@@ -167,16 +167,16 @@ int main(int argc, const char* argv[])
     for (int i = 0; i < flow_direction.nrows; ++i)
     {
         for (int j = 0; j < flow_direction.ncols; ++j)
-            cout << flow_direction(i, j).visited << " ";
+            cout << flow_direction(i, j).direction << " ";
         cout << '\n';
     }
 
-    compute_flow_direction(flow_direction, cells_queue);
+    compute_flow_direction(flow_direction, cells_queue, insert);
 
     for (int i = 0; i < flow_direction.nrows; ++i)
     {
         for (int j = 0; j < flow_direction.ncols; ++j)
-            cout << flow_direction(i, j).visited << " ";
+            cout << flow_direction(i, j).direction << " ";
         cout << '\n';
     }
 

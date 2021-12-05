@@ -82,7 +82,7 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
             r(i + 1, j).insertion_order = ++order;
             r(i + 1, j).listed = true;
             myqueue.emplace(r(i + 1, j));
-        }// diagonal neighbour
+        }// bottom neighbour
       
         break;
     } //up-left corner
@@ -378,27 +378,49 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
         break;
     } // cells with 8 neighbours
 
-    //case clauses can be merged
-
     default: // loc = 0 outside of the boundary
         break;
     }
-
 
 }
 
 
 void compute_flow_direction(ProRaster& r, 
-    std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue)
+    std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order)
 {
     while (!myqueue.empty())
     {
+        // process the current cell
         int i(myqueue.top().row), j(myqueue.top().col); //row and col of processing cell
         r(i, j).visited = true; // current cell: visited = true
-        
-        //set directions of its neighbours
-        //r(i+1,j+1).direction = 1/2/4/.../128
         myqueue.pop();
+
+        //set directions of its neighbours
+        int loc(adjacent_pixel_types(i, j, r.nrows, r.ncols));
+        switch (loc){
+        
+        case 31: {
+            // right neighbour
+            if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
+            
+            // diagonal neighbour
+            if (!r(i + 1, j + 1).direction)r(i + 1, j + 1).direction = 32;
+            
+            // bottom neighbour
+            if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
+
+            break;
+        } //up-left corner
+
+
+
+        default:
+            break;
+        }
+        //r(i+1,j+1).direction = 1/2/4/.../128
+
+        //add the neighbours to the queue
+
     }
 }
 

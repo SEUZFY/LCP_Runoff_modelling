@@ -17,4 +17,4 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
 
 // compute every direction of each cell
 void compute_flow_direction(ProRaster& r,
-	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue);
+	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order);
