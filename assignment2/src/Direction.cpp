@@ -390,7 +390,7 @@ void compute_flow_direction(ProRaster& r,
 {
     while (!myqueue.empty())
     {
-        // process the current cell
+        //process the current cell
         int i(myqueue.top().row), j(myqueue.top().col); //row and col of processing cell
         r(i, j).visited = true; // current cell: visited = true
         myqueue.pop();
@@ -400,26 +400,167 @@ void compute_flow_direction(ProRaster& r,
         switch (loc){
         
         case 31: {
-            // right neighbour
+            //right neighbour
             if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
             
-            // diagonal neighbour
+            //diagonal neighbour
             if (!r(i + 1, j + 1).direction)r(i + 1, j + 1).direction = 32;
             
-            // bottom neighbour
+            //bottom neighbour
             if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
 
             break;
         } //up-left corner
 
+        case 32: {
+            //bottom neighbour
+            if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
+            
+            //diagonal neighbour
+            if (!r(i + 1, j - 1).direction)r(i + 1, j - 1).direction = 128;
+            
+            //left neighbour
+            if (!r(i, j - 1).direction)r(i, j - 1).direction = 1;
+            
+            break;
+        } //up-right corner
 
+        case 33: {
+            //left neighbour
+            if (!r(i, j - 1).direction)r(i, j - 1).direction = 1;
+            
+            //diagonal neighbour
+            if (!r(i - 1, j - 1).direction)r(i - 1, j - 1).direction = 2;
+            
+            //top neighbour
+            if (!r(i - 1, j).direction)r(i - 1, j).direction = 4;
+
+            break;
+        } //low-right corner
+
+        case 34: {
+            //top neighbour
+            if (!r(i - 1, j).direction)r(i - 1, j).direction = 4;
+            
+            //diagonal neighbour
+            if (!r(i - 1, j + 1).direction)r(i - 1, j + 1).direction = 8;
+            
+            //right neighbour
+            if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
+
+            break;
+        } //low-left corner
+
+        case 51: {
+            //right neighbour
+            if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
+            
+            //diagonal neighbour
+            if (!r(i + 1, j + 1).direction)r(i + 1, j + 1).direction = 32;
+            
+            //bottom neighbour
+            if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
+            
+            //diagonal neighbour
+            if (!r(i + 1, j - 1).direction)r(i + 1, j - 1).direction = 128;
+            
+            //left neighbour
+            if (!r(i, j - 1).direction)r(i, j - 1).direction = 1;
+            
+            break;
+        } //top row
+
+        case 52: {
+            //bottom neighbour
+            if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
+            
+            //diagonal neighbour
+            if (!r(i + 1, j - 1).direction)r(i + 1, j - 1).direction = 128;
+            
+            //left neighbour
+            if (!r(i, j - 1).direction)r(i, j - 1).direction = 1;
+            
+            //diagonal neighbour
+            if (!r(i - 1, j - 1).direction)r(i - 1, j - 1).direction = 2;
+            
+            //top neighbour
+            if (!r(i - 1, j).direction)r(i - 1, j).direction = 4;
+            
+            break;
+        } //rightmost row
+        
+        case 53: {
+            //left neighbour
+            if (!r(i, j - 1).direction)r(i, j - 1).direction = 1;
+            
+            //diagonal neighbour
+            if (!r(i - 1, j - 1).direction)r(i - 1, j - 1).direction = 2;
+            
+            //top neighbour
+            if (!r(i - 1, j).direction)r(i - 1, j).direction = 4;
+            
+            //diagonal neighbour
+            if (!r(i - 1, j + 1).direction)r(i - 1, j + 1).direction = 8;
+            
+            //right neighbour
+            if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
+            
+            break;
+        } //bottom row
+
+        case 54: {
+            //top neighbour
+            if (!r(i - 1, j).direction)r(i - 1, j).direction = 4;
+            
+            //diagonal neighbour
+            if (!r(i - 1, j + 1).direction)r(i - 1, j + 1).direction = 8;
+            
+            //right neighbour
+            if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
+            
+            //diagonal neighbour
+            if (!r(i + 1, j + 1).direction)r(i + 1, j + 1).direction = 32;
+            
+            //bottom neighbour
+            if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
+
+            break;
+        } //leftmost row
+
+        case 8: {
+            //diagonal neighbour
+            if (!r(i - 1, j - 1).direction)r(i - 1, j - 1).direction = 2;
+      
+            //top neighbour
+            if (!r(i - 1, j).direction)r(i - 1, j).direction = 4;
+            
+            //diagonal neighbour
+            if (!r(i - 1, j + 1).direction)r(i - 1, j + 1).direction = 8;
+            
+            //right neighbour
+            if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
+            
+            //diagonal neighbour
+            if (!r(i + 1, j + 1).direction)r(i + 1, j + 1).direction = 32;
+            
+            //bottom neighbour
+            if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
+            
+            //diagonal neighbour
+            if (!r(i + 1, j - 1).direction)r(i + 1, j - 1).direction = 128;
+            
+            //left neighbour
+            if (!r(i, j - 1).direction)r(i, j - 1).direction = 1;
+            
+            break;
+        } //cells with 8 neighbours
 
         default:
             break;
         }
-        //r(i+1,j+1).direction = 1/2/4/.../128
 
         //add the neighbours to the queue
+        add_neighbours(i, j, r, myqueue, order);
 
     }
 }
