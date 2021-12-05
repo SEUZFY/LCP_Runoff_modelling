@@ -1,4 +1,7 @@
+#include <iostream>
+#include <fstream>
 #include <queue>
+
 #include "Raster.h"
 #include "Direction.h"
 
@@ -562,6 +565,33 @@ void compute_flow_direction(ProRaster& r,
         //add the neighbours to the queue
         add_neighbours(i, j, r, myqueue, order);
 
+    }
+}
+
+void output_raster(ProRaster& r, const double& pixelsize, 
+    const double& topx, const double& topy)
+{
+    int ncols(r.ncols), nrows(r.nrows);
+    double lowy(topy - pixelsize * r.nrows);
+
+    std::ofstream outfile("D:/AlbertQ2/GEO1015/test.asc", std::ios::out);
+    if (!outfile)std::cout << "File open issue, please check. " << '\n';
+    else
+    {
+        outfile << "NCOLS" << " " << ncols << '\n';
+        outfile << "NROWS" << " " << nrows << '\n';
+        outfile << "XLLCORNER" << " " << topx << '\n'; // low-left and up-left: x coordinate is same
+        outfile << "YLLCORNER" << " " << lowy << '\n'; // origin y is topy, need to be converted to lowy
+        outfile << "CELLSIZE" << " " << pixelsize << '\n';
+        outfile << "NODATA_VALUE" << " " << -9999 << '\n';
+
+        for (int i = 0; i != nrows; ++i)
+        {
+            for (int j = 0; j != ncols; ++j) outfile << r(i, j).direction << " ";
+            outfile << '\n';
+        }
+
+        outfile.close(); // close the file
     }
 }
 

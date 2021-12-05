@@ -1,6 +1,5 @@
 #include <iostream>
 #include <queue>
-#include <fstream>
 #include <chrono>
 #include <thread>
 #include <future>
@@ -31,34 +30,6 @@ std::ostream& operator<<(std::ostream& os, const RasterCell& c) {
 }
 
 
-// Write the raster file to an .asc file
-void output_raster(const Raster& raster, const double& pixelsize, const double& topx, const double& topy)
-{
-    int ncols(raster.ncols), nrows(raster.nrows);
-    double lowy(topy - pixelsize * raster.nrows);
-
-    ofstream outfile("D:/AlbertQ2/GEO1015/test.asc", ios::out); 
-    if (!outfile)cout << "File open issue, please check. " << '\n';
-    else
-    {
-        outfile << "NCOLS" << " " << ncols << '\n';
-        outfile << "NROWS" << " " << nrows << '\n';
-        outfile << "XLLCORNER" << " " << topx << '\n'; // low-left and up-left: x coordinate is same
-        outfile << "YLLCORNER" << " " << lowy << '\n'; // origin y is topy, need to be converted to lowy
-        outfile << "CELLSIZE" << " " << pixelsize << '\n';
-        outfile << "NODATA_VALUE" << " " << -9999 << '\n';
-
-        for (int i = 0; i != nrows; ++i)
-        {
-            for (int j = 0; j != ncols; ++j) outfile << raster(i,j) << " ";
-            outfile << '\n';
-        }
-  
-        outfile.close(); // close the file
-    }  
-}
-
-
 void flow_direction(Raster* raster)
 {
     sleep_for(seconds(2));
@@ -77,7 +48,7 @@ int main(int argc, const char* argv[])
 
     ios::sync_with_stdio(false); //speed up for cin and cout
 
-    /*
+    
     GDALAllRegister();
     GDALDataset* input_dataset((GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N29E120.hgt", GA_ReadOnly));
     if (!input_dataset) {
@@ -145,42 +116,45 @@ int main(int argc, const char* argv[])
     cout << "Created raster: " << input_raster.nrows << " x " 
         << input_raster.ncols << " = " << input_raster.pixels.size() << '\n';
 
-    */
-
     //minimum heap
     std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
-    Raster d(3, 3), d1(3, 6);
+
+    /*Raster d(3, 3), d1(3, 6);
     d.fill();
     d(0, 0) = 9; d(0, 1) = 8; d(0, 2) = 7;
     d(1, 0) = 8; d(1, 1) = 7; d(1, 2) = 6;
-    d(2, 0) = 7; d(2, 1) = 6; d(2, 2) = 5;
+    d(2, 0) = 7; d(2, 1) = 6; d(2, 2) = 5;*/
 
     // insert: global variable, standing for the insertion order
     int insert(0);
 
-    ProRaster flow_direction(3, 3);
-    flow_direction.fill_proraster(d);
+    ProRaster flow_direction(input_raster.nrows, input_raster.ncols);
+    flow_direction.fill_proraster(input_raster);
 
     //add the potential outlets: boundary, adding order: clockwise
-    add_outlets_boundary(d.nrows, d.ncols, flow_direction, cells_queue,insert);
+    add_outlets_boundary(input_raster.nrows, input_raster.ncols, flow_direction, cells_queue,insert);
 
+    /*
     for (int i = 0; i < flow_direction.nrows; ++i)
     {
         for (int j = 0; j < flow_direction.ncols; ++j)
             cout << flow_direction(i, j).direction << " ";
         cout << '\n';
     }
+    */
 
     compute_flow_direction(flow_direction, cells_queue, insert);
 
-    for (int i = 0; i < flow_direction.nrows; ++i)
+    output_raster(flow_direction, geo_transform[1], geo_transform[0], geo_transform[3]);
+
+    /*for (int i = 0; i < flow_direction.nrows; ++i)
     {
         for (int j = 0; j < flow_direction.ncols; ++j)
             cout << flow_direction(i, j).direction << " ";
         cout << '\n';
     }
 
-    cout << "\n";
+    cout << "\n";*/
 
     //add_neighbours(1, 1, flow_direction, cells_queue, insert);
 
@@ -195,7 +169,7 @@ int main(int argc, const char* argv[])
     cout << adjacent_pixel_types(6, 6, d1);*/
     
     
-    cout << insert << '\n';
+    //cout << insert << '\n';
 
    
     
@@ -264,7 +238,7 @@ int main(int argc, const char* argv[])
     // to do
 
     // Close input dataset
-    // GDALClose(input_dataset);
+    GDALClose(input_dataset);
 
 	return 0;
 }
