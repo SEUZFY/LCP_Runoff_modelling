@@ -30,17 +30,11 @@ int Raster::operator()(const int& row, const int& col) const {
     return pixels[col + row * ncols];
 }
 
-void Raster::set_value(const int& row, const int& col, const int& value) {
-    assert(row >= 0 && row < nrows);
-    assert(col >= 0 && col < ncols);
-    pixels[col + row * ncols] = value;
-}
-
 // RasterCell
 
 RasterCell::RasterCell(const int& c_row, const int& c_col, const int& elevation)
     :row(c_row), col(c_col), elevation(elevation), insertion_order(0),
-    visited(false), listed(false), direction(0) {}
+    visited(false), listed(false), direction(0), accumulation(0){}
 
 bool RasterCell::operator<(const RasterCell& other) const {
     return ((other.elevation) < (this->elevation)) ||
@@ -72,4 +66,8 @@ RasterCell& ProRaster::operator()(const int& row, const int& col)
     return propixels[col + row * ncols];
 }
 
+void ProRaster::output_scanline(const int* line)
+{
+
+}
 

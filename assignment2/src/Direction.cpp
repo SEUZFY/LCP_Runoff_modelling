@@ -389,7 +389,8 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
 
 
 void compute_flow_direction(ProRaster& r, 
-    std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order)
+    std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, 
+    std::vector<RasterCell>& cellsvector, int& order)
 {
     while (!myqueue.empty())
     {
@@ -562,11 +563,64 @@ void compute_flow_direction(ProRaster& r,
             break;
         }
 
+        //add the processing cell to the vector(opposite order)
+        cellsvector.emplace_back(r(i, j));
+
         //add the neighbours to the queue
         add_neighbours(i, j, r, myqueue, order);
 
     }
 }
+
+
+void compute_flow_accumulation(ProRaster& r, std::vector<RasterCell>& cell_vector)
+{
+    /*the direction of the first cell in cell_vector needs to be assigned because in the
+    * compute_flow_direction() function, after the calculation, the direction of the
+    first cell in the priority queue is still unknown, yet it is added to the cell_vector
+    */
+
+    //assign the direction of the first cell in cell_vector
+    cell_vector.front().direction = r(cell_vector.front().row, cell_vector.front().col).direction;
+    
+    while (!cell_vector.empty()) {
+        int i(cell_vector.back().row), j(cell_vector.back().col);
+        int direct(r(i, j).direction);
+
+        switch (direct) 
+        {
+        case 1:
+            r(i, j + 1).accumulation += (1 + r(i, j).accumulation);
+            break;
+        case 2:
+            r(i + 1, j + 1).accumulation += (1 + r(i, j).accumulation);
+            break;
+        case 4:
+            r(i + 1, j).accumulation += (1 + r(i, j).accumulation);
+            break;
+        case 8:
+            r(i + 1, j - 1).accumulation += (1 + r(i, j).accumulation);
+            break;
+        case 16:
+            r(i, j - 1).accumulation += (1 + r(i, j).accumulation);
+            break;
+        case 32:
+            r(i - 1, j - 1).accumulation += (1 + r(i, j).accumulation);
+            break;
+        case 64:
+            r(i - 1, j).accumulation += (1 + r(i, j).accumulation);
+            break;
+        case 128:
+            r(i - 1, j + 1).accumulation += (1 + r(i, j).accumulation);
+            break;
+        default:
+            break;
+        }
+        //pop the processing cell
+        cell_vector.pop_back();
+    }
+}
+
 
 void output_raster(ProRaster& r, const double& pixelsize, 
     const double& topx, const double& topy)
@@ -587,7 +641,7 @@ void output_raster(ProRaster& r, const double& pixelsize,
 
         for (int i = 0; i != nrows; ++i)
         {
-            for (int j = 0; j != ncols; ++j) outfile << r(i, j).direction << " ";
+            for (int j = 0; j != ncols; ++j) outfile << r(i, j).accumulation << " ";
             outfile << '\n';
         }
 

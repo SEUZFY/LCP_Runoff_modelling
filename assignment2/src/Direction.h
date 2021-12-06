@@ -17,7 +17,11 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
 
 // compute every direction of each cell
 void compute_flow_direction(ProRaster& r,
-	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, int& order);
+	std::priority_queue<RasterCell, std::deque<RasterCell>>& myqueue, 
+	std::vector<RasterCell>& cellsvector, int& order);
+
+// compute every accumulation of each cell
+void compute_flow_accumulation(ProRaster& r, std::vector<RasterCell>& cell_vector);
 
 // output the direction raster file
 void output_raster(ProRaster& raster, const double& pixelsize,

@@ -22,9 +22,6 @@ struct Raster {
     // Access the value of a raster cell to read it
     int operator()(const int& row, const int& col) const;
 
-    //Access the value of a raster cell to set its value
-    void set_value(const int& row, const int& col, const int& value);
-
 };
 
 // A structure that links to a single cell in a Raster
@@ -36,6 +33,7 @@ struct RasterCell {
     bool visited; // if not yet visited: false, once visited: true
     bool listed; // if not yet been added to the list: false, once added: true
     int direction; // direction of current cell, initialized with 0
+    int accumulation; // accumulation of each cell
 
     // Defines a new link to a cell
     RasterCell(const int& c_row, const int& c_col, const int& elevation);
@@ -58,4 +56,7 @@ struct ProRaster {
 
     // Access the value of a raster cell to read or write it
     RasterCell& operator()(const int& row, const int& col);
+
+    // Output the proraster file line by line
+    void output_scanline(const int* line);
 };

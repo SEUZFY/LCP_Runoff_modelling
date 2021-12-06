@@ -33,7 +33,6 @@ std::ostream& operator<<(std::ostream& os, const RasterCell& c) {
 void flow_direction(Raster* raster)
 {
     sleep_for(seconds(2));
-    raster->set_value(2, 3, 4);
 }
 
 
@@ -45,12 +44,11 @@ void flow_accumulation(Raster raster)
 
 int main(int argc, const char* argv[])
 {  
-
+    
     ios::sync_with_stdio(false); //speed up for cin and cout
 
-    
     GDALAllRegister();
-    GDALDataset* input_dataset((GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N29E120.hgt", GA_ReadOnly));
+    GDALDataset* input_dataset((GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N52E020.hgt", GA_ReadOnly));
     if (!input_dataset) {
         cerr << "Couldn't open file" << '\n';
         return 1;
@@ -115,15 +113,17 @@ int main(int argc, const char* argv[])
 
     cout << "Created raster: " << input_raster.nrows << " x " 
         << input_raster.ncols << " = " << input_raster.pixels.size() << '\n';
+    
 
     //minimum heap
     std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
 
-    /*Raster d(3, 3), d1(3, 6);
-    d.fill();
-    d(0, 0) = 9; d(0, 1) = 8; d(0, 2) = 7;
-    d(1, 0) = 8; d(1, 1) = 7; d(1, 2) = 6;
-    d(2, 0) = 7; d(2, 1) = 6; d(2, 2) = 5;*/
+    /*
+    Raster input_raster(3, 3), d1(3, 6);
+    input_raster.fill();
+    input_raster(0, 0) = 9; input_raster(0, 1) = 8; input_raster(0, 2) = 7;
+    input_raster(1, 0) = 8; input_raster(1, 1) = 7; input_raster(1, 2) = 6; 
+    input_raster(2, 0) = 7; input_raster(2, 1) = 6; input_raster(2, 2) = 5; */
 
     // insert: global variable, standing for the insertion order
     int insert(0);
@@ -143,18 +143,26 @@ int main(int argc, const char* argv[])
     }
     */
 
-    compute_flow_direction(flow_direction, cells_queue, insert);
+    //vector to store the cells: opposite order of the cells_queue
+    std::vector<RasterCell> cells_vector;
 
+    //compute flow direction
+    compute_flow_direction(flow_direction, cells_queue, cells_vector, insert);
+
+    //compute flow accumulation   
+    compute_flow_accumulation(flow_direction, cells_vector);
+   
     output_raster(flow_direction, geo_transform[1], geo_transform[0], geo_transform[3]);
 
-    /*for (int i = 0; i < flow_direction.nrows; ++i)
+    
+    for (int i = 0; i < flow_direction.nrows; ++i)
     {
         for (int j = 0; j < flow_direction.ncols; ++j)
             cout << flow_direction(i, j).direction << " ";
         cout << '\n';
     }
 
-    cout << "\n";*/
+    //cout << "\n";
 
     //add_neighbours(1, 1, flow_direction, cells_queue, insert);
 
