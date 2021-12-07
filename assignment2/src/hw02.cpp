@@ -154,13 +154,13 @@ int main(int argc, const char* argv[])
    
     output_raster(flow_direction, geo_transform[1], geo_transform[0], geo_transform[3]);
 
-    
+    /*
     for (int i = 0; i < flow_direction.nrows; ++i)
     {
         for (int j = 0; j < flow_direction.ncols; ++j)
             cout << flow_direction(i, j).direction << " ";
         cout << '\n';
-    }
+    }*/
 
     //cout << "\n";
 
