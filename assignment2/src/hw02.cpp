@@ -145,12 +145,36 @@ int main(int argc, const char* argv[])
     }
     GDALDataset* output_accumulation(outputDriver->CreateCopy("D:/AlbertQ2/GEO1015/test.tif", input_dataset, FALSE,
         NULL, NULL, NULL));
-    
+    if (!output_accumulation) {
+        cerr << "Couldn't generate file" << '\n';
+        return 1;
+    }
+
+    GDALRasterBand* output_band(output_accumulation->GetRasterBand(1));
+    int* output_line((int*)CPLMalloc(sizeof(float)* nXSize));
+    for (int current_scanline = 0; current_scanline != nYSize; ++current_scanline)
+    {
+        //int* scanline((int*)CPLMalloc(sizeof(float) * nXSize)); // DONT forget to use CPLFree(scanline)
+        if (output_band->RasterIO(GF_Write, 0, current_scanline, nXSize, 1,
+            output_line, nXSize, 1, GDT_UInt32,
+            0, 0) != CPLE_None)
+        {
+            cerr << "Couldn't read scanline " << current_scanline << '\n';
+            return 1;
+        }
+        flow_direction.output_scanline(output_line);
+        
+    }
+    CPLFree(output_line);
+
+    // Close output dataset
     if (output_accumulation != NULL)
         GDALClose((GDALDatasetH)output_accumulation);
 
     // Close input dataset
     GDALClose(input_dataset);
+
+    //GDALDestroyDriverManager(); need to call or not?
 
     return 0;
 
