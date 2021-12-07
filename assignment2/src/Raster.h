@@ -58,5 +58,5 @@ struct ProRaster {
     RasterCell& operator()(const int& row, const int& col);
 
     // Output the proraster file line by line
-    void output_scanline(int* line);
+    void output_scanline(int& current_line, int* line);
 };

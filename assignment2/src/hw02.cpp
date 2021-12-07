@@ -156,13 +156,13 @@ int main(int argc, const char* argv[])
     {
         //int* scanline((int*)CPLMalloc(sizeof(float) * nXSize)); // DONT forget to use CPLFree(scanline)
         if (output_band->RasterIO(GF_Write, 0, current_scanline, nXSize, 1,
-            output_line, nXSize, 1, GDT_UInt32,
+            output_line, nXSize, 1, GDT_Int32,
             0, 0) != CPLE_None)
         {
-            cerr << "Couldn't read scanline " << current_scanline << '\n';
+            cerr << "Couldn't load output_line " << current_scanline << '\n';
             return 1;
         }
-        flow_direction.output_scanline(output_line);
+        flow_direction.output_scanline(current_scanline, output_line);
         
     }
     CPLFree(output_line);

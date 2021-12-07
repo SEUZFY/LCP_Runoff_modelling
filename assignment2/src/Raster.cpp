@@ -66,8 +66,8 @@ RasterCell& ProRaster::operator()(const int& row, const int& col)
     return propixels[col + row * ncols];
 }
 
-void ProRaster::output_scanline(int* line)
+void ProRaster::output_scanline(int& current_line, int* line)
 {
-    for (int i = 0; i < ncols; ++i) line[i] = 0;
+    for (int i = 0; i < ncols; ++i) line[i] = propixels[i + current_line*ncols].direction;
 }
 
