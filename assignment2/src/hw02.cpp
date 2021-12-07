@@ -114,16 +114,8 @@ int main(int argc, const char* argv[])
     cout << "Created raster: " << input_raster.nrows << " x " 
         << input_raster.ncols << " = " << input_raster.pixels.size() << '\n';
     
-
     //minimum heap
     std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
-
-    /*
-    Raster input_raster(3, 3), d1(3, 6);
-    input_raster.fill();
-    input_raster(0, 0) = 9; input_raster(0, 1) = 8; input_raster(0, 2) = 7;
-    input_raster(1, 0) = 8; input_raster(1, 1) = 7; input_raster(1, 2) = 6; 
-    input_raster(2, 0) = 7; input_raster(2, 1) = 6; input_raster(2, 2) = 5; */
 
     // insert: global variable, standing for the insertion order
     int insert(0);
@@ -134,15 +126,6 @@ int main(int argc, const char* argv[])
     //add the potential outlets: boundary, adding order: clockwise
     add_outlets_boundary(input_raster.nrows, input_raster.ncols, flow_direction, cells_queue,insert);
 
-    /*
-    for (int i = 0; i < flow_direction.nrows; ++i)
-    {
-        for (int j = 0; j < flow_direction.ncols; ++j)
-            cout << flow_direction(i, j).direction << " ";
-        cout << '\n';
-    }
-    */
-
     //vector to store the cells: opposite order of the cells_queue
     std::vector<RasterCell> cells_vector;
 
@@ -152,7 +135,35 @@ int main(int argc, const char* argv[])
     //compute flow accumulation   
     compute_flow_accumulation(flow_direction, cells_vector);
    
-    output_raster(flow_direction, geo_transform[1], geo_transform[0], geo_transform[3]);
+    //output_raster(flow_direction, geo_transform[1], geo_transform[0], geo_transform[3]);
+
+    const char* outputFormat = "GTiff";
+    GDALDriver* outputDriver(GetGDALDriverManager()->GetDriverByName(outputFormat));
+    if (!outputDriver) {
+        cerr << "Couldn't set driver" << '\n';
+        return 1;
+    }
+    GDALDataset* output_accumulation(outputDriver->CreateCopy("D:/AlbertQ2/GEO1015/test.tif", input_dataset, FALSE,
+        NULL, NULL, NULL));
+    
+    if (output_accumulation != NULL)
+        GDALClose((GDALDatasetH)output_accumulation);
+
+    // Close input dataset
+    GDALClose(input_dataset);
+
+    return 0;
+
+}
+
+
+/*
+    Raster input_raster(3, 3), d1(3, 6);
+    input_raster.fill();
+    input_raster(0, 0) = 9; input_raster(0, 1) = 8; input_raster(0, 2) = 7;
+    input_raster(1, 0) = 8; input_raster(1, 1) = 7; input_raster(1, 2) = 6;
+    input_raster(2, 0) = 7; input_raster(2, 1) = 6; input_raster(2, 2) = 5; */
+
 
     /*
     for (int i = 0; i < flow_direction.nrows; ++i)
@@ -161,6 +172,15 @@ int main(int argc, const char* argv[])
             cout << flow_direction(i, j).direction << " ";
         cout << '\n';
     }*/
+
+    /*
+    for (int i = 0; i < flow_direction.nrows; ++i)
+    {
+        for (int j = 0; j < flow_direction.ncols; ++j)
+            cout << flow_direction(i, j).direction << " ";
+        cout << '\n';
+    }
+    */
 
     //cout << "\n";
 
@@ -175,12 +195,12 @@ int main(int argc, const char* argv[])
     }
     cout << '\n';
     cout << adjacent_pixel_types(6, 6, d1);*/
-    
-    
+
+
     //cout << insert << '\n';
 
-   
-    
+
+
 
     //Raster r(3, 3);
     //r.fill();
@@ -189,7 +209,7 @@ int main(int argc, const char* argv[])
 
     //RasterCell cella(0, 0, 20, 1), cellb(0, 0, 30, 2);
     //std::cout << (cella < cellb);
-    
+
     // Get Start Time
     //system_clock::time_point start = system_clock::now();
 
@@ -207,12 +227,12 @@ int main(int argc, const char* argv[])
 
 
     //output_raster(input_raster, geo_transform[1], geo_transform[0], geo_transform[3]);
-   
+
 
     // Flow direction
     //Raster flow_direction(input_raster.nrows, input_raster.ncols);
     //flow_direction.fill();
-    
+
     //std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
     //unsigned int size(input_raster.pixels.size());
     //int order(0);
@@ -244,9 +264,3 @@ int main(int argc, const char* argv[])
 
     // Write flow accumulation
     // to do
-
-    // Close input dataset
-    GDALClose(input_dataset);
-
-	return 0;
-}
