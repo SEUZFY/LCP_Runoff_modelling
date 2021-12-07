@@ -143,7 +143,7 @@ int main(int argc, const char* argv[])
         cerr << "Couldn't set driver" << '\n';
         return 1;
     }
-    GDALDataset* output_accumulation(outputDriver->CreateCopy("D:/AlbertQ2/GEO1015/test.tif", input_dataset, FALSE,
+    GDALDataset* output_accumulation(outputDriver->CreateCopy("D:/AlbertQ2/GEO1015/test2.tif", input_dataset, FALSE,
         NULL, NULL, NULL));
     if (!output_accumulation) {
         cerr << "Couldn't generate file" << '\n';
