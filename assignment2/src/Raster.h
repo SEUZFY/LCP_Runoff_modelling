@@ -2,7 +2,7 @@
 #include <vector>
 
 // Storage and access of a raster of a given size
-
+/*
 struct Raster {
     std::vector<int> pixels; // where everything is stored
     int nrows, ncols; // number of rows and cols
@@ -22,7 +22,7 @@ struct Raster {
     // Access the value of a raster cell to read it
     int operator()(const int& row, const int& col) const;
 
-};
+};*/
 
 // A structure that links to a single cell in a Raster
 
@@ -52,10 +52,13 @@ struct ProRaster {
     ProRaster(const int& rows, const int& cols);
 
     // Initialise the proraster with raster
-    void fill_proraster(const Raster& r);
+    //void fill_proraster(const Raster& r);
 
     // Access the value of a raster cell to read or write it
     RasterCell& operator()(const int& row, const int& col);
+    
+    // Add scanline: Fill values of an entire row
+    void add_scanline(int& current_line, const int* line);
 
     // Output the proraster file line by line
     void output_scanline(int& current_line, int* line);

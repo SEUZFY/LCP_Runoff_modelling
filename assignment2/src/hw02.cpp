@@ -29,17 +29,17 @@ std::ostream& operator<<(std::ostream& os, const RasterCell& c) {
     return os;
 }
 
-
+/*
 void flow_direction(Raster* raster)
 {
     sleep_for(seconds(2));
-}
+}*/
 
-
+/*
 void flow_accumulation(Raster raster)
 {
     sleep_for(seconds(2));
-}
+}*/
 
 
 int main(int argc, const char* argv[])
@@ -48,7 +48,7 @@ int main(int argc, const char* argv[])
     ios::sync_with_stdio(false); //speed up for cin and cout
 
     GDALAllRegister();
-    GDALDataset* input_dataset((GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N52E020.hgt", GA_ReadOnly));
+    GDALDataset* input_dataset((GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N29E120.hgt", GA_ReadOnly));
     if (!input_dataset) {
         cerr << "Couldn't open file" << '\n';
         return 1;
@@ -93,7 +93,7 @@ int main(int argc, const char* argv[])
     // Read Band 1 line by line
     int nXSize(input_band->GetXSize()); //width(ncols)
     int nYSize(input_band->GetYSize()); //height(nrows)
-    Raster input_raster(nYSize, nXSize); //Raster(nrows, ncols)
+    ProRaster input_raster(nYSize, nXSize); //Raster(nrows, ncols)
 
     int* scanline((int*)CPLMalloc(sizeof(float) * nXSize));
     for (int current_scanline = 0; current_scanline != nYSize; ++current_scanline)
@@ -106,13 +106,13 @@ int main(int argc, const char* argv[])
             cerr << "Couldn't read scanline " << current_scanline << '\n';
             return 1;
         }
-        input_raster.add_scanline(scanline);
+        input_raster.add_scanline(current_scanline, scanline);
         //CPLFree(scanline); //corresponding to the allocation "scanline"
     }
     CPLFree(scanline);
 
     cout << "Created raster: " << input_raster.nrows << " x " 
-        << input_raster.ncols << " = " << input_raster.pixels.size() << '\n';
+        << input_raster.ncols << " = " << input_raster.propixels.size() << '\n';
     
     //minimum heap
     std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
@@ -120,20 +120,20 @@ int main(int argc, const char* argv[])
     // insert: global variable, standing for the insertion order
     int insert(0);
 
-    ProRaster flow_direction(input_raster.nrows, input_raster.ncols);
-    flow_direction.fill_proraster(input_raster);
+    //ProRaster flow_direction(input_raster.nrows, input_raster.ncols);
+    //flow_direction.fill_proraster(input_raster);
 
     //add the potential outlets: boundary, adding order: clockwise
-    add_outlets_boundary(input_raster.nrows, input_raster.ncols, flow_direction, cells_queue,insert);
+    add_outlets_boundary(input_raster.nrows, input_raster.ncols, input_raster, cells_queue,insert);
 
     //vector to store the cells: opposite order of the cells_queue
     std::vector<RasterCell> cells_vector;
 
     //compute flow direction
-    compute_flow_direction(flow_direction, cells_queue, cells_vector, insert);
+    compute_flow_direction(input_raster, cells_queue, cells_vector, insert);
 
     //compute flow accumulation   
-    compute_flow_accumulation(flow_direction, cells_vector);
+    compute_flow_accumulation(input_raster, cells_vector);
    
     //output_raster(flow_direction, geo_transform[1], geo_transform[0], geo_transform[3]);
 
@@ -143,7 +143,7 @@ int main(int argc, const char* argv[])
         cerr << "Couldn't set driver" << '\n';
         return 1;
     }
-    GDALDataset* output_accumulation(outputDriver->CreateCopy("D:/AlbertQ2/GEO1015/test2.tif", input_dataset, FALSE,
+    GDALDataset* output_accumulation(outputDriver->CreateCopy("D:/AlbertQ2/GEO1015/accumulation.tif", input_dataset, FALSE,
         NULL, NULL, NULL));
     if (!output_accumulation) {
         cerr << "Couldn't generate file" << '\n';
@@ -162,7 +162,7 @@ int main(int argc, const char* argv[])
             cerr << "Couldn't load output_line " << current_scanline << '\n';
             return 1;
         }
-        flow_direction.output_scanline(current_scanline, output_line);
+        input_raster.output_scanline(current_scanline, output_line);
         
     }
     CPLFree(output_line);

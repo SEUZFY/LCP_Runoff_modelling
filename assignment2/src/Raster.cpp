@@ -2,7 +2,7 @@
 #include <cassert>
 
 // Raster
-
+/*
 Raster::Raster(const int& rows, const int& cols)
     : nrows(rows), ncols(cols) {
     unsigned int total_pixels = rows * cols; //unsigned int for big size
@@ -28,7 +28,7 @@ int Raster::operator()(const int& row, const int& col) const {
     assert(row >= 0 && row < nrows);
     assert(col >= 0 && col < ncols);
     return pixels[col + row * ncols];
-}
+}*/
 
 // RasterCell
 
@@ -50,6 +50,7 @@ ProRaster::ProRaster(const int& rows, const int& cols)
     propixels.reserve(total_pixels);
 }
 
+/*
 void ProRaster::fill_proraster(const Raster& r)
 {
     for (int i = 0; i < r.nrows; ++i) {
@@ -57,13 +58,18 @@ void ProRaster::fill_proraster(const Raster& r)
             propixels.emplace_back(RasterCell(i, j, r(i, j)));
         }
     }
-}
+}*/
 
 RasterCell& ProRaster::operator()(const int& row, const int& col)
 {
     assert(row >= 0 && row < nrows);
     assert(col >= 0 && col < ncols);
     return propixels[col + row * ncols];
+}
+
+void ProRaster::add_scanline(int& current_line, const int* line)
+{
+    for (int i = 0; i < ncols; ++i)propixels.emplace_back(RasterCell(current_line, i, line[i]));
 }
 
 void ProRaster::output_scanline(int& current_line, int* line)
