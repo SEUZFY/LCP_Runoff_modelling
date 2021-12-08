@@ -24,5 +24,5 @@ void compute_flow_direction(ProRaster& r,
 void compute_flow_accumulation(ProRaster& r, std::vector<RasterCell>& cell_vector);
 
 // output the direction raster file
-void output_raster(ProRaster& raster, const double& pixelsize,
-	const double& topx, const double& topy);
+void output_raster(const char* filename_direction, const char* filename_accumulation,
+	ProRaster& r, const double& pixelsize, const double& topx, const double& topy);

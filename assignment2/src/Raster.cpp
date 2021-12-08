@@ -72,7 +72,7 @@ void ProRaster::add_scanline(int& current_line, const int* line)
     for (int i = 0; i < ncols; ++i)propixels.emplace_back(RasterCell(current_line, i, line[i]));
 }
 
-void ProRaster::output_scanline(int& current_line, int* line)
+void ProRaster::output_scanline(int& current_line, unsigned int* line)
 {
     for (int i = 0; i < ncols; ++i) line[i] = propixels[i + current_line*ncols].accumulation;
 }

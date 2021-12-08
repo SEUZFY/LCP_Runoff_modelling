@@ -49,7 +49,12 @@ int main(int argc, const char* argv[])
 
     if (argc <= 1) {
         cout << "This is: " << argv[0] << '\n';
+        cout << '\n';
         cout << "Please Call this program with two files as program arguments" << '\n';
+        cout << '\n';
+        cout << "1. The first argument would be the FULL file path of the input file; " << '\n';
+        cout << "2. The second argument would be the FULL file path and NAME of the output raster; " << '\n';
+
         return EXIT_FAILURE;
     }
     else {
@@ -142,8 +147,9 @@ int main(int argc, const char* argv[])
         //compute flow accumulation   
         compute_flow_accumulation(input_raster, cells_vector);
 
-        //output_raster(flow_direction, geo_transform[1], geo_transform[0], geo_transform[3]);
+        output_raster(argv[2], argv[3], input_raster, geo_transform[1], geo_transform[0], geo_transform[3]);
 
+        /*
         const char* outputFormat = "GTiff";
         GDALDriver* outputDriver(GetGDALDriverManager()->GetDriverByName(outputFormat));
         if (!outputDriver) {
@@ -152,18 +158,22 @@ int main(int argc, const char* argv[])
         }
 
         const char* outputfile = argv[2];
+        
         GDALDataset* output_accumulation(outputDriver->CreateCopy(outputfile, input_dataset, FALSE,
             NULL, NULL, NULL));
+        
+        GDALDataset* output_accumulation(outputDriver->Create(outputfile,
+            nXSize, nYSize, 1, GDT_Int32, NULL));
         if (!output_accumulation) {
             cerr << "Couldn't generate file" << '\n';
             return 1;
         }
 
         GDALRasterBand* output_band(output_accumulation->GetRasterBand(1));
-        int* output_line((int*)CPLMalloc(sizeof(float) * nXSize));
+        cout << GDALGetDataTypeName(output_band->GetRasterDataType());
+        unsigned int* output_line((unsigned int*)CPLMalloc(sizeof(unsigned int) * nXSize));
         for (int current_scanline = 0; current_scanline != nYSize; ++current_scanline)
         {
-            //int* scanline((int*)CPLMalloc(sizeof(float) * nXSize)); // DONT forget to use CPLFree(scanline)
             if (output_band->RasterIO(GF_Write, 0, current_scanline, nXSize, 1,
                 output_line, nXSize, 1, GDT_Int32,
                 0, 0) != CPLE_None)
@@ -175,15 +185,24 @@ int main(int argc, const char* argv[])
 
         }
         CPLFree(output_line);
+        */
+
+       /* cout << GDALGetDataTypeName(output_band->GetRasterDataType()); INT 16
+        const char* pszFormat = "GTiff";
+        GDALDriver* poDriver;
+        poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
+        GDALDataset* poDstDS;
+        char** papszOptions = NULL;
+        poDstDS = poDriver->Create("D:/AlbertQ2/GEO1015/create.tiff", 512, 512, 1, GDT_Byte,
+            papszOptions);*/
+
 
         // Close output dataset
-        if (output_accumulation != NULL)
-            GDALClose((GDALDatasetH)output_accumulation);
+        //if (output_accumulation != NULL)
+            //GDALClose((GDALDatasetH)output_accumulation);
 
         // Close input dataset
         GDALClose(input_dataset);
-
-        //GDALDestroyDriverManager(); need to call or not?
 
         return EXIT_SUCCESS; //EXIT_SUCCESS
 

@@ -622,30 +622,53 @@ void compute_flow_accumulation(ProRaster& r, std::vector<RasterCell>& cell_vecto
 }
 
 
-void output_raster(ProRaster& r, const double& pixelsize, 
-    const double& topx, const double& topy)
+void output_raster(const char* filename_direction, const char* filename_accumulation, 
+    ProRaster& r, const double& pixelsize, const double& topx, const double& topy)
 {
     int ncols(r.ncols), nrows(r.nrows);
     double lowy(topy - pixelsize * r.nrows);
 
-    std::ofstream outfile("D:/AlbertQ2/GEO1015/test.asc", std::ios::out);
-    if (!outfile)std::cout << "File open issue, please check. " << '\n';
+    // outfile: direction.asc
+    std::ofstream outfile_d(filename_direction, std::ios::out);
+    if (!outfile_d)std::cout << "File open issue, please check. " << '\n';
     else
     {
-        outfile << "NCOLS" << " " << ncols << '\n';
-        outfile << "NROWS" << " " << nrows << '\n';
-        outfile << "XLLCORNER" << " " << topx << '\n'; // low-left and up-left: x coordinate is same
-        outfile << "YLLCORNER" << " " << lowy << '\n'; // origin y is topy, need to be converted to lowy
-        outfile << "CELLSIZE" << " " << pixelsize << '\n';
-        outfile << "NODATA_VALUE" << " " << -9999 << '\n';
+        outfile_d << "ncols" << " " << ncols << '\n';
+        outfile_d << "nrows " << " " << nrows << '\n';
+        outfile_d << "xllcorner " << " " << topx << '\n'; // low-left and up-left: x coordinate is same
+        outfile_d << "yllcorner" << " " << lowy << '\n'; // origin y is topy, need to be converted to lowy
+        outfile_d << "cellsize" << " " << pixelsize << '\n';
+        outfile_d << "NODATA_value" << " " << -32768 << '\n';
 
         for (int i = 0; i != nrows; ++i)
         {
-            for (int j = 0; j != ncols; ++j) outfile << r(i, j).accumulation << " ";
-            outfile << '\n';
+            for (int j = 0; j != ncols; ++j) outfile_d << r(i, j).direction << " ";
+            outfile_d << '\n';
         }
 
-        outfile.close(); // close the file
+        outfile_d.close(); // close the file
     }
+
+    // outfile: accumulation.asc
+    std::ofstream outfile_a(filename_accumulation, std::ios::out);
+    if (!outfile_a)std::cout << "File open issue, please check. " << '\n';
+    else
+    {
+        outfile_a << "ncols" << " " << ncols << '\n';
+        outfile_a << "nrows " << " " << nrows << '\n';
+        outfile_a << "xllcorner " << " " << topx << '\n'; // low-left and up-left: x coordinate is same
+        outfile_a << "yllcorner" << " " << lowy << '\n'; // origin y is topy, need to be converted to lowy
+        outfile_a << "cellsize" << " " << pixelsize << '\n';
+        outfile_a << "NODATA_value" << " " << -32768 << '\n';
+
+        for (int i = 0; i != nrows; ++i)
+        {
+            for (int j = 0; j != ncols; ++j) outfile_a << r(i, j).accumulation << " ";
+            outfile_a << '\n';
+        }
+
+        outfile_a.close(); // close the file
+    }
+
 }
 

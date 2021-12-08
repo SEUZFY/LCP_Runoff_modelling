@@ -33,7 +33,7 @@ struct RasterCell {
     bool visited; // if not yet visited: false, once visited: true
     bool listed; // if not yet been added to the list: false, once added: true
     int direction; // direction of current cell, initialized with 0
-    int accumulation; // accumulation of each cell
+    unsigned int accumulation; // accumulation of each cell
 
     // Defines a new link to a cell
     RasterCell(const int& c_row, const int& c_col, const int& elevation);
@@ -61,5 +61,5 @@ struct ProRaster {
     void add_scanline(int& current_line, const int* line);
 
     // Output the proraster file line by line
-    void output_scanline(int& current_line, int* line);
+    void output_scanline(int& current_line, unsigned int* line);
 };
