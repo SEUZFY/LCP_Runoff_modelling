@@ -47,137 +47,148 @@ int main(int argc, const char* argv[])
     
     ios::sync_with_stdio(false); //speed up for cin and cout
 
-    GDALAllRegister();
-    GDALDataset* input_dataset((GDALDataset*)GDALOpen("D:/AlbertQ2/GEO1015/N29E120.hgt", GA_ReadOnly));
-    if (!input_dataset) {
-        cerr << "Couldn't open file" << '\n';
-        return 1;
+    if (argc <= 1) {
+        cout << "This is: " << argv[0] << '\n';
+        cout << "Please Call this program with two files as program arguments" << '\n';
+        return EXIT_FAILURE;
     }
-
-    //Print dataset info
-    cout << '\n';
-    cout << "dataset info: " << '\n';
-
-    double geo_transform[6]{ 0 };
-    cout << "Driver: " << input_dataset->GetDriver()->GetDescription()
-        << "/" << input_dataset->GetDriver()->GetMetadataItem(GDAL_DMD_LONGNAME) << '\n';
-    cout << "width size is: " << input_dataset->GetRasterXSize() << '\n';
-    cout << "hight size is: " << input_dataset->GetRasterYSize() << '\n';
-    cout << "the number of raster bands: " << input_dataset->GetRasterCount() << '\n';
-    
-    if (input_dataset->GetProjectionRef() != NULL) cout << "Projection is '" << input_dataset->GetProjectionRef() << "'" << '\n';
-    if (input_dataset->GetGeoTransform(geo_transform) == CE_None) {
-        cout << "Origin = (" << geo_transform[0] << ", " << geo_transform[3] << ")" << '\n';
-        cout << "Pixel Size = (" << geo_transform[1] << ", " << geo_transform[5] << ")" << '\n';
-    }//Origin is the top-left corner
-
-    // Print Band 1 info
-    cout << '\n';
-    cout << "Band 1 info: " << '\n';
-
-    GDALRasterBand* input_band(input_dataset->GetRasterBand(1));
-    int nBlockXSize, nBlockYSize;
-    int bGotMin, bGotMax;
-    double adfMinMax[2]{ 0 };
-    
-    input_band->GetBlockSize(&nBlockXSize, &nBlockYSize); //XSize=3601, YSize=1, "scanline"
-    cout << "Band 1 Block=" << nBlockXSize << " x " << nBlockYSize << " Type=" 
-        << GDALGetDataTypeName(input_band->GetRasterDataType()) << " ColorInterp=" 
-        << GDALGetColorInterpretationName(input_band->GetColorInterpretation()) << '\n';
-
-    adfMinMax[0] = input_band->GetMinimum(&bGotMin);
-    adfMinMax[1] = input_band->GetMaximum(&bGotMax);
-    if (!(bGotMin && bGotMax)) GDALComputeRasterMinMax((GDALRasterBandH)input_band, TRUE, adfMinMax);
-    cout << "Min=" << adfMinMax[0] << " Max=" << adfMinMax[1] << '\n';
-
-    // Read Band 1 line by line
-    int nXSize(input_band->GetXSize()); //width(ncols)
-    int nYSize(input_band->GetYSize()); //height(nrows)
-    ProRaster input_raster(nYSize, nXSize); //Raster(nrows, ncols)
-
-    int* scanline((int*)CPLMalloc(sizeof(float) * nXSize));
-    for (int current_scanline = 0; current_scanline != nYSize; ++current_scanline)
-    {
-        //int* scanline((int*)CPLMalloc(sizeof(float) * nXSize)); // DONT forget to use CPLFree(scanline)
-        if (input_band->RasterIO(GF_Read, 0, current_scanline, nXSize, 1,
-            scanline, nXSize, 1, GDT_Int32,
-            0, 0) != CPLE_None)
-        {
-            cerr << "Couldn't read scanline " << current_scanline << '\n';
+    else {
+        GDALAllRegister();
+        const char* srcfile = argv[1];
+        GDALDataset* input_dataset((GDALDataset*)GDALOpen(srcfile, GA_ReadOnly));
+        if (!input_dataset) {
+            cerr << "Couldn't open file" << '\n';
             return 1;
         }
-        input_raster.add_scanline(current_scanline, scanline);
-        //CPLFree(scanline); //corresponding to the allocation "scanline"
-    }
-    CPLFree(scanline);
 
-    cout << "Created raster: " << input_raster.nrows << " x " 
-        << input_raster.ncols << " = " << input_raster.propixels.size() << '\n';
-    
-    //minimum heap
-    std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
+        //Print dataset info
+        cout << '\n';
+        cout << "dataset info: " << '\n';
 
-    // insert: global variable, standing for the insertion order
-    int insert(0);
+        double geo_transform[6]{ 0 };
+        cout << "Driver: " << input_dataset->GetDriver()->GetDescription()
+            << "/" << input_dataset->GetDriver()->GetMetadataItem(GDAL_DMD_LONGNAME) << '\n';
+        cout << "width size is: " << input_dataset->GetRasterXSize() << '\n';
+        cout << "hight size is: " << input_dataset->GetRasterYSize() << '\n';
+        cout << "the number of raster bands: " << input_dataset->GetRasterCount() << '\n';
 
-    //ProRaster flow_direction(input_raster.nrows, input_raster.ncols);
-    //flow_direction.fill_proraster(input_raster);
+        if (input_dataset->GetProjectionRef() != NULL) cout << "Projection is '" << input_dataset->GetProjectionRef() << "'" << '\n';
+        if (input_dataset->GetGeoTransform(geo_transform) == CE_None) {
+            cout << "Origin = (" << geo_transform[0] << ", " << geo_transform[3] << ")" << '\n';
+            cout << "Pixel Size = (" << geo_transform[1] << ", " << geo_transform[5] << ")" << '\n';
+        }//Origin is the top-left corner
 
-    //add the potential outlets: boundary, adding order: clockwise
-    add_outlets_boundary(input_raster.nrows, input_raster.ncols, input_raster, cells_queue,insert);
+        // Print Band 1 info
+        cout << '\n';
+        cout << "Band 1 info: " << '\n';
 
-    //vector to store the cells: opposite order of the cells_queue
-    std::vector<RasterCell> cells_vector;
+        GDALRasterBand* input_band(input_dataset->GetRasterBand(1));
+        int nBlockXSize, nBlockYSize;
+        int bGotMin, bGotMax;
+        double adfMinMax[2]{ 0 };
 
-    //compute flow direction
-    compute_flow_direction(input_raster, cells_queue, cells_vector, insert);
+        input_band->GetBlockSize(&nBlockXSize, &nBlockYSize); //XSize=3601, YSize=1, "scanline"
+        cout << "Band 1 Block=" << nBlockXSize << " x " << nBlockYSize << " Type="
+            << GDALGetDataTypeName(input_band->GetRasterDataType()) << " ColorInterp="
+            << GDALGetColorInterpretationName(input_band->GetColorInterpretation()) << '\n';
 
-    //compute flow accumulation   
-    compute_flow_accumulation(input_raster, cells_vector);
-   
-    //output_raster(flow_direction, geo_transform[1], geo_transform[0], geo_transform[3]);
+        adfMinMax[0] = input_band->GetMinimum(&bGotMin);
+        adfMinMax[1] = input_band->GetMaximum(&bGotMax);
+        if (!(bGotMin && bGotMax)) GDALComputeRasterMinMax((GDALRasterBandH)input_band, TRUE, adfMinMax);
+        cout << "Min=" << adfMinMax[0] << " Max=" << adfMinMax[1] << '\n';
 
-    const char* outputFormat = "GTiff";
-    GDALDriver* outputDriver(GetGDALDriverManager()->GetDriverByName(outputFormat));
-    if (!outputDriver) {
-        cerr << "Couldn't set driver" << '\n';
-        return 1;
-    }
-    GDALDataset* output_accumulation(outputDriver->CreateCopy("D:/AlbertQ2/GEO1015/accumulation.tif", input_dataset, FALSE,
-        NULL, NULL, NULL));
-    if (!output_accumulation) {
-        cerr << "Couldn't generate file" << '\n';
-        return 1;
-    }
+        // Read Band 1 line by line
+        int nXSize(input_band->GetXSize()); //width(ncols)
+        int nYSize(input_band->GetYSize()); //height(nrows)
+        ProRaster input_raster(nYSize, nXSize); //Raster(nrows, ncols)
 
-    GDALRasterBand* output_band(output_accumulation->GetRasterBand(1));
-    int* output_line((int*)CPLMalloc(sizeof(float)* nXSize));
-    for (int current_scanline = 0; current_scanline != nYSize; ++current_scanline)
-    {
-        //int* scanline((int*)CPLMalloc(sizeof(float) * nXSize)); // DONT forget to use CPLFree(scanline)
-        if (output_band->RasterIO(GF_Write, 0, current_scanline, nXSize, 1,
-            output_line, nXSize, 1, GDT_Int32,
-            0, 0) != CPLE_None)
+        int* scanline((int*)CPLMalloc(sizeof(float) * nXSize));
+        for (int current_scanline = 0; current_scanline != nYSize; ++current_scanline)
         {
-            cerr << "Couldn't load output_line " << current_scanline << '\n';
+            //int* scanline((int*)CPLMalloc(sizeof(float) * nXSize)); // DONT forget to use CPLFree(scanline)
+            if (input_band->RasterIO(GF_Read, 0, current_scanline, nXSize, 1,
+                scanline, nXSize, 1, GDT_Int32,
+                0, 0) != CPLE_None)
+            {
+                cerr << "Couldn't read scanline " << current_scanline << '\n';
+                return 1;
+            }
+            input_raster.add_scanline(current_scanline, scanline);
+            //CPLFree(scanline); //corresponding to the allocation "scanline"
+        }
+        CPLFree(scanline);
+
+        cout << "Created raster: " << input_raster.nrows << " x "
+            << input_raster.ncols << " = " << input_raster.propixels.size() << '\n';
+
+        //minimum heap
+        std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
+
+        // insert: global variable, standing for the insertion order
+        int insert(0);
+
+        //ProRaster flow_direction(input_raster.nrows, input_raster.ncols);
+        //flow_direction.fill_proraster(input_raster);
+
+        //add the potential outlets: boundary, adding order: clockwise
+        add_outlets_boundary(input_raster.nrows, input_raster.ncols, input_raster, cells_queue, insert);
+
+        //vector to store the cells: opposite order of the cells_queue
+        std::vector<RasterCell> cells_vector;
+
+        //compute flow direction
+        compute_flow_direction(input_raster, cells_queue, cells_vector, insert);
+
+        //compute flow accumulation   
+        compute_flow_accumulation(input_raster, cells_vector);
+
+        //output_raster(flow_direction, geo_transform[1], geo_transform[0], geo_transform[3]);
+
+        const char* outputFormat = "GTiff";
+        GDALDriver* outputDriver(GetGDALDriverManager()->GetDriverByName(outputFormat));
+        if (!outputDriver) {
+            cerr << "Couldn't set driver" << '\n';
             return 1;
         }
-        input_raster.output_scanline(current_scanline, output_line);
-        
+
+        const char* outputfile = argv[2];
+        GDALDataset* output_accumulation(outputDriver->CreateCopy(outputfile, input_dataset, FALSE,
+            NULL, NULL, NULL));
+        if (!output_accumulation) {
+            cerr << "Couldn't generate file" << '\n';
+            return 1;
+        }
+
+        GDALRasterBand* output_band(output_accumulation->GetRasterBand(1));
+        int* output_line((int*)CPLMalloc(sizeof(float) * nXSize));
+        for (int current_scanline = 0; current_scanline != nYSize; ++current_scanline)
+        {
+            //int* scanline((int*)CPLMalloc(sizeof(float) * nXSize)); // DONT forget to use CPLFree(scanline)
+            if (output_band->RasterIO(GF_Write, 0, current_scanline, nXSize, 1,
+                output_line, nXSize, 1, GDT_Int32,
+                0, 0) != CPLE_None)
+            {
+                cerr << "Couldn't load output_line " << current_scanline << '\n';
+                return 1;
+            }
+            input_raster.output_scanline(current_scanline, output_line);
+
+        }
+        CPLFree(output_line);
+
+        // Close output dataset
+        if (output_accumulation != NULL)
+            GDALClose((GDALDatasetH)output_accumulation);
+
+        // Close input dataset
+        GDALClose(input_dataset);
+
+        //GDALDestroyDriverManager(); need to call or not?
+
+        return EXIT_SUCCESS; //EXIT_SUCCESS
+
     }
-    CPLFree(output_line);
-
-    // Close output dataset
-    if (output_accumulation != NULL)
-        GDALClose((GDALDatasetH)output_accumulation);
-
-    // Close input dataset
-    GDALClose(input_dataset);
-
-    //GDALDestroyDriverManager(); need to call or not?
-
-    return 0;
-
+    
 }
 
 
