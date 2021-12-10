@@ -622,8 +622,9 @@ void compute_flow_accumulation(ProRaster& r, std::vector<RasterCell>& cell_vecto
 }
 
 
-void output_raster(const char* filename_direction, const char* filename_accumulation, 
-    ProRaster& r, const double& pixelsize, const double& topx, const double& topy)
+void output_raster(const char* filename_direction, const char* filename_accumulation,
+    const char* direction_proj, const char* accumulation_proj, ProRaster& r, const double& pixelsize,
+    const double& topx, const double& topy, const GDALDataset* dataset)
 {
     int ncols(r.ncols), nrows(r.nrows);
     double lowy(topy - pixelsize * r.nrows);
@@ -648,6 +649,14 @@ void output_raster(const char* filename_direction, const char* filename_accumula
 
         outfile_d.close(); // close the file
     }
+    // outfile: direction.prj
+    std::ofstream outfile_d_p(direction_proj, std::ios::out);
+    const char* p = "GEOGCS[\"GCS_WGS_1984\", DATUM[\"D_WGS_1984\", SPHEROID[\"WGS_1984\", 6378137.0, 298.257223563]], PRIMEM[\"Greenwich\", 0.0], UNIT[\"Degree\", 0.0174532925199433]]";
+    if (!outfile_d_p)std::cout << p << '\n';
+    else {
+        outfile_d_p << dataset->GetProjectionRef() << '\n';
+        outfile_d_p.close(); // close the file
+    }
 
     // outfile: accumulation.asc
     std::ofstream outfile_a(filename_accumulation, std::ios::out);
@@ -668,6 +677,13 @@ void output_raster(const char* filename_direction, const char* filename_accumula
         }
 
         outfile_a.close(); // close the file
+    }
+    // outfile: accumulation.prj
+    std::ofstream outfile_a_p(accumulation_proj, std::ios::out);
+    if (!outfile_a_p)std::cout << p << '\n';
+    else {
+        outfile_a_p << dataset->GetProjectionRef() << '\n';
+        outfile_a_p.close(); // close the file
     }
 
 }

@@ -1,6 +1,8 @@
 #pragma once
+
 #include <queue>
 #include "Raster.h"
+#include "gdal_priv.h"
 
 //Functions realted to compute flow directions.
 
@@ -25,4 +27,5 @@ void compute_flow_accumulation(ProRaster& r, std::vector<RasterCell>& cell_vecto
 
 // output the direction raster file
 void output_raster(const char* filename_direction, const char* filename_accumulation,
-	ProRaster& r, const double& pixelsize, const double& topx, const double& topy);
+	const char* direction_proj, const char* accumulation_proj, ProRaster& r, const double& pixelsize,
+	const double& topx, const double& topy, const GDALDataset* dataset);

@@ -74,6 +74,6 @@ void ProRaster::add_scanline(int& current_line, const int* line)
 
 void ProRaster::output_scanline(int& current_line, unsigned int* line)
 {
-    for (int i = 0; i < ncols; ++i) line[i] = propixels[i + current_line*ncols].accumulation;
+    for (int i = 0; i < ncols; ++i) line[i] = propixels[i + current_line*ncols].direction;
 }
 

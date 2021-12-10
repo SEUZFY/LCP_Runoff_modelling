@@ -5,6 +5,7 @@
 #include <future>
 #include "gdal_priv.h"
 #include "cpl_conv.h"
+#include "string"
 
 #include "Raster.h"
 #include "Direction.h"
@@ -59,7 +60,7 @@ int main(int argc, const char* argv[])
     }
     else {
         GDALAllRegister();
-        const char* srcfile = argv[1];
+        const char* srcfile = argv[1]; //file name of the input dataset
         GDALDataset* input_dataset((GDALDataset*)GDALOpen(srcfile, GA_ReadOnly));
         if (!input_dataset) {
             cerr << "Couldn't open file" << '\n';
@@ -147,8 +148,44 @@ int main(int argc, const char* argv[])
         //compute flow accumulation   
         compute_flow_accumulation(input_raster, cells_vector);
 
-        output_raster(argv[2], argv[3], input_raster, geo_transform[1], geo_transform[0], geo_transform[3]);
+        //output raster files(asc files and prj files)
+        /*output_raster(argv[2], argv[3], argv[4], argv[5], input_raster, geo_transform[1], 
+            geo_transform[0], geo_transform[3], input_dataset);*/
 
+        std::string extension(".tif"), tiffname(argv[1]);
+        tiffname += extension;
+        GDALDriver* driverGeotiff(GetGDALDriverManager()->GetDriverByName("GTiff"));
+        if (!driverGeotiff) {
+            cerr << "Couldn't set driver" << '\n';
+            return 1;
+        }
+        GDALDataset* geotiffDataset(driverGeotiff->Create(tiffname.c_str(), nXSize, nYSize, 1, GDT_Int32, NULL));
+        geotiffDataset->SetGeoTransform(geo_transform);
+        geotiffDataset->SetProjection(input_dataset->GetProjectionRef());
+
+        unsigned int* output_line((unsigned int*)CPLMalloc(sizeof(unsigned int)* nXSize));
+        for (int current_scanline = 0; current_scanline != nYSize; ++current_scanline)
+        {
+            input_raster.output_scanline(current_scanline, output_line); //first assign the values to line[i]
+            if (geotiffDataset->GetRasterBand(1)->RasterIO(GF_Write, 0, current_scanline, nXSize, 1,
+                output_line, nXSize, 1, GDT_UInt32, 0, 0) != CPLE_None) //write the values into the raster file
+            {
+                cerr << "Couldn't load output_line " << current_scanline << '\n';
+                return 1;
+            }
+                      
+        }
+        CPLFree(output_line);
+
+
+        GDALClose(geotiffDataset);
+
+
+        // Close input dataset
+        GDALClose(input_dataset);
+        std::cout << "done" << '\n';
+
+        return EXIT_SUCCESS; //EXIT_SUCCESS
         /*
         const char* outputFormat = "GTiff";
         GDALDriver* outputDriver(GetGDALDriverManager()->GetDriverByName(outputFormat));
@@ -201,10 +238,7 @@ int main(int argc, const char* argv[])
         //if (output_accumulation != NULL)
             //GDALClose((GDALDatasetH)output_accumulation);
 
-        // Close input dataset
-        GDALClose(input_dataset);
-
-        return EXIT_SUCCESS; //EXIT_SUCCESS
+        
 
     }
     
