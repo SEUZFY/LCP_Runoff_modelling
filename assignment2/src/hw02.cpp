@@ -127,46 +127,46 @@ int main(int argc, const char* argv[])
         cout << "Created raster: " << input_raster.nrows << " x "
             << input_raster.ncols << " = " << input_raster.propixels.size() << '\n';
 
-        //minimum heap
+        /*minimum heap*/
         std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
 
-        // insert: global variable, standing for the insertion order
+        /*insert: global variable, standing for the insertion order*/
         int insert(0);
 
-        //ProRaster flow_direction(input_raster.nrows, input_raster.ncols);
-        //flow_direction.fill_proraster(input_raster);
-
-        //add the potential outlets: boundary, adding order: clockwise
+        /*add the potential outlets : boundary, adding order : clockwise*/
         add_outlets_boundary(input_raster.nrows, input_raster.ncols, input_raster, cells_queue, insert);
 
-        //vector to store the cells: opposite order of the cells_queue
+        /*vector to store the cells : opposite order of the cells_queue*/
         std::vector<RasterCell> cells_vector;
 
-        //compute flow direction
         compute_flow_direction(input_raster, cells_queue, cells_vector, insert);
 
-        //compute flow accumulation   
         compute_flow_accumulation(input_raster, cells_vector);
 
-        //output raster files(asc files and prj files)
-        /*output_raster(argv[2], argv[3], argv[4], argv[5], input_raster, geo_transform[1], 
-            geo_transform[0], geo_transform[3], input_dataset);*/
+        /* output the result rasters, named by the input dataset
+         * output flow direction file */
 
-        std::string extension(".tif"), tiffname(argv[1]);
-        tiffname += extension;
+        std::string extension("flow_direction.tif"), tiffname(argv[1]);
+        tiffname += extension; //set the name and path of the flow_direction file
         GDALDriver* driverGeotiff(GetGDALDriverManager()->GetDriverByName("GTiff"));
         if (!driverGeotiff) {
             cerr << "Couldn't set driver" << '\n';
             return 1;
         }
         GDALDataset* geotiffDataset(driverGeotiff->Create(tiffname.c_str(), nXSize, nYSize, 1, GDT_Int32, NULL));
+        if (!geotiffDataset) {
+            cerr << "Couldn't set geotiff file" << '\n';
+            return 1;
+        }
         geotiffDataset->SetGeoTransform(geo_transform);
         geotiffDataset->SetProjection(input_dataset->GetProjectionRef());
 
         unsigned int* output_line((unsigned int*)CPLMalloc(sizeof(unsigned int)* nXSize));
+
         for (int current_scanline = 0; current_scanline != nYSize; ++current_scanline)
         {
-            input_raster.output_scanline(current_scanline, output_line); //first assign the values to line[i]
+            input_raster.output_direction(current_scanline, output_line); //first assign the values to line[i]
+            
             if (geotiffDataset->GetRasterBand(1)->RasterIO(GF_Write, 0, current_scanline, nXSize, 1,
                 output_line, nXSize, 1, GDT_UInt32, 0, 0) != CPLE_None) //write the values into the raster file
             {
@@ -175,180 +175,66 @@ int main(int argc, const char* argv[])
             }
                       
         }
-        CPLFree(output_line);
 
+        /* output the flow accumulation file */
 
-        GDALClose(geotiffDataset);
-
-
-        // Close input dataset
-        GDALClose(input_dataset);
-        std::cout << "done" << '\n';
-
-        return EXIT_SUCCESS; //EXIT_SUCCESS
-        /*
-        const char* outputFormat = "GTiff";
-        GDALDriver* outputDriver(GetGDALDriverManager()->GetDriverByName(outputFormat));
-        if (!outputDriver) {
-            cerr << "Couldn't set driver" << '\n';
+        extension = "flow_accumulation.tif";
+        tiffname = argv[1];
+        tiffname += extension; //set the name and path of the flow_direction file
+        geotiffDataset = driverGeotiff->Create(tiffname.c_str(), nXSize, nYSize, 1, GDT_Int32, NULL);
+        if (!geotiffDataset) {
+            cerr << "Couldn't set geotiff file" << '\n';
             return 1;
         }
+        geotiffDataset->SetGeoTransform(geo_transform);
+        geotiffDataset->SetProjection(input_dataset->GetProjectionRef());
 
-        const char* outputfile = argv[2];
-        
-        GDALDataset* output_accumulation(outputDriver->CreateCopy(outputfile, input_dataset, FALSE,
-            NULL, NULL, NULL));
-        
-        GDALDataset* output_accumulation(outputDriver->Create(outputfile,
-            nXSize, nYSize, 1, GDT_Int32, NULL));
-        if (!output_accumulation) {
-            cerr << "Couldn't generate file" << '\n';
-            return 1;
-        }
-
-        GDALRasterBand* output_band(output_accumulation->GetRasterBand(1));
-        cout << GDALGetDataTypeName(output_band->GetRasterDataType());
-        unsigned int* output_line((unsigned int*)CPLMalloc(sizeof(unsigned int) * nXSize));
         for (int current_scanline = 0; current_scanline != nYSize; ++current_scanline)
         {
-            if (output_band->RasterIO(GF_Write, 0, current_scanline, nXSize, 1,
-                output_line, nXSize, 1, GDT_Int32,
-                0, 0) != CPLE_None)
+            input_raster.output_accumulation(current_scanline, output_line); //first assign the values to line[i]
+            
+            if (geotiffDataset->GetRasterBand(1)->RasterIO(GF_Write, 0, current_scanline, nXSize, 1,
+                output_line, nXSize, 1, GDT_UInt32, 0, 0) != CPLE_None) //write the values into the raster file
             {
                 cerr << "Couldn't load output_line " << current_scanline << '\n';
                 return 1;
             }
-            input_raster.output_scanline(current_scanline, output_line);
 
         }
+
         CPLFree(output_line);
-        */
 
-       /* cout << GDALGetDataTypeName(output_band->GetRasterDataType()); INT 16
-        const char* pszFormat = "GTiff";
-        GDALDriver* poDriver;
-        poDriver = GetGDALDriverManager()->GetDriverByName(pszFormat);
-        GDALDataset* poDstDS;
-        char** papszOptions = NULL;
-        poDstDS = poDriver->Create("D:/AlbertQ2/GEO1015/create.tiff", 512, 512, 1, GDT_Byte,
-            papszOptions);*/
+        // Close
+        GDALClose(geotiffDataset);
+        GDALClose(input_dataset);
+        GDALDestroyDriverManager();
 
+        std::cout << "done" << '\n';
+        std::cout << "You should be able to have the two geotiff files in the same folder directory of the input dataset" << '\n';
 
-        // Close output dataset
-        //if (output_accumulation != NULL)
-            //GDALClose((GDALDatasetH)output_accumulation);
-
-        
+        return EXIT_SUCCESS; //EXIT_SUCCESS
 
     }
-    
+
 }
 
-
-/*
-    Raster input_raster(3, 3), d1(3, 6);
-    input_raster.fill();
-    input_raster(0, 0) = 9; input_raster(0, 1) = 8; input_raster(0, 2) = 7;
-    input_raster(1, 0) = 8; input_raster(1, 1) = 7; input_raster(1, 2) = 6;
-    input_raster(2, 0) = 7; input_raster(2, 1) = 6; input_raster(2, 2) = 5; */
-
-
     /*
-    for (int i = 0; i < flow_direction.nrows; ++i)
-    {
-        for (int j = 0; j < flow_direction.ncols; ++j)
-            cout << flow_direction(i, j).direction << " ";
-        cout << '\n';
-    }*/
-
-    /*
-    for (int i = 0; i < flow_direction.nrows; ++i)
-    {
-        for (int j = 0; j < flow_direction.ncols; ++j)
-            cout << flow_direction(i, j).direction << " ";
-        cout << '\n';
-    }
-    */
-
-    //cout << "\n";
-
-    //add_neighbours(1, 1, flow_direction, cells_queue, insert);
-
-    //identify the adjacent pixel types
-    /*for (int i = 0; i < d1.nrows; ++i)
-    {
-        for (int j = 0; j < d1.ncols; ++j)
-            cout << adjacent_pixel_types(i, j, d1) << " ";
-        cout << '\n';
-    }
-    cout << '\n';
-    cout << adjacent_pixel_types(6, 6, d1);*/
-
-
-    //cout << insert << '\n';
-
-
-
-
-    //Raster r(3, 3);
-    //r.fill();
-    //r(2, 2) = 1;
-    //std::cout<<r(2,2);
-
-    //RasterCell cella(0, 0, 20, 1), cellb(0, 0, 30, 2);
-    //std::cout << (cella < cellb);
-
     // Get Start Time
-    //system_clock::time_point start = system_clock::now();
+    system_clock::time_point start = system_clock::now();
 
-    //Raster r_flow_direction(input_raster.nrows, input_raster.ncols);
-    //r_flow_direction.fill();
+    Raster r_flow_direction(input_raster.nrows, input_raster.ncols);
+    r_flow_direction.fill();
 
-    //future<void> resultFromDirection = async(launch::async, flow_direction, &r_flow_direction);
-    //flow_accumulation(input_raster);
-    //resultFromDirection.get();
+    future<void> resultFromDirection = async(launch::async, flow_direction, &r_flow_direction);
+    flow_accumulation(input_raster);
+    resultFromDirection.get();
 
-    //// Get End Time
-    //auto end = system_clock::now();
-    //auto diff = duration_cast <seconds> (end - start).count();
-    //cout << "Total Time Taken = " << diff << " Seconds" << '\n';
-
-
-    //output_raster(input_raster, geo_transform[1], geo_transform[0], geo_transform[3]);
+    // Get End Time
+    auto end = system_clock::now();
+    auto diff = duration_cast <seconds> (end - start).count();
+    cout << "Total Time Taken = " << diff << " Seconds" << '\n';*/
 
 
-    // Flow direction
-    //Raster flow_direction(input_raster.nrows, input_raster.ncols);
-    //flow_direction.fill();
+   
 
-    //std::priority_queue<RasterCell, std::deque<RasterCell>> cells_queue;
-    //unsigned int size(input_raster.pixels.size());
-    //int order(0);
-    //for (int i = 0; i != nYSize; ++i)
-    //{
-    //    for (int j = 0; j != nXSize; ++j)
-    //    {
-    //        //calculate insertion order for each cell: order
-    //        order += 1;
-    //        cells_queue.push(RasterCell(i, j, input_raster(i, j), order));
-    //    }         
-    //}
-
-    //while (!cells_queue.empty())
-    //{
-    //     cout << cells_queue.top() << ' ';
-    //     cells_queue.pop();
-    //} 
-
-
-    // to do
-
-    // Write flow direction
-    // to do
-
-    // Flow accumulation
-    //Raster flow_accumulation(input_raster.nrows, input_raster.ncols);
-    // to do
-
-    // Write flow accumulation
-    // to do
+   

@@ -50,15 +50,6 @@ ProRaster::ProRaster(const int& rows, const int& cols)
     propixels.reserve(total_pixels);
 }
 
-/*
-void ProRaster::fill_proraster(const Raster& r)
-{
-    for (int i = 0; i < r.nrows; ++i) {
-        for (int j = 0; j < r.ncols; ++j) {
-            propixels.emplace_back(RasterCell(i, j, r(i, j)));
-        }
-    }
-}*/
 
 RasterCell& ProRaster::operator()(const int& row, const int& col)
 {
@@ -67,13 +58,21 @@ RasterCell& ProRaster::operator()(const int& row, const int& col)
     return propixels[col + row * ncols];
 }
 
+
 void ProRaster::add_scanline(int& current_line, const int* line)
 {
     for (int i = 0; i < ncols; ++i)propixels.emplace_back(RasterCell(current_line, i, line[i]));
 }
 
-void ProRaster::output_scanline(int& current_line, unsigned int* line)
+
+void ProRaster::output_direction(int& current_line, unsigned int* line)
 {
     for (int i = 0; i < ncols; ++i) line[i] = propixels[i + current_line*ncols].direction;
+}
+
+
+void ProRaster::output_accumulation(int& current_line, unsigned int* line)
+{
+    for (int i = 0; i < ncols; ++i) line[i] = propixels[i + current_line * ncols].accumulation;
 }
 

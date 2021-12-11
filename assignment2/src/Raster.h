@@ -51,15 +51,15 @@ struct ProRaster {
     // Initialise a raster with rows and cols
     ProRaster(const int& rows, const int& cols);
 
-    // Initialise the proraster with raster
-    //void fill_proraster(const Raster& r);
-
     // Access the value of a raster cell to read or write it
     RasterCell& operator()(const int& row, const int& col);
     
     // Add scanline: Fill values of an entire row
     void add_scanline(int& current_line, const int* line);
 
-    // Output the proraster file line by line
-    void output_scanline(int& current_line, unsigned int* line);
+    // Output the direction proraster file line by line
+    void output_direction(int& current_line, unsigned int* line);
+
+    // Output the accumulation proraster file line by line
+    void output_accumulation(int& current_line, unsigned int* line);
 };
