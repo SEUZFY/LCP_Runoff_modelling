@@ -21,7 +21,7 @@
     <ClCompile Include="src\Raster.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Direction.cpp">
+    <ClCompile Include="src\DA.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -29,7 +29,7 @@
     <ClInclude Include="src\Raster.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\Direction.h">
+    <ClInclude Include="src\DA.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,7 +3,7 @@
 #include <queue>
 
 #include "Raster.h"
-#include "Direction.h"
+#include "DA.h"
 
 
 void add_outlets_boundary(const int& Nrows, const int& Ncols, ProRaster& r,

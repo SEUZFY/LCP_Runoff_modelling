@@ -146,12 +146,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Direction.cpp" />
+    <ClCompile Include="src\DA.cpp" />
     <ClCompile Include="src\hw02.cpp" />
     <ClCompile Include="src\Raster.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Direction.h" />
+    <ClInclude Include="src\DA.h" />
     <ClInclude Include="src\Raster.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

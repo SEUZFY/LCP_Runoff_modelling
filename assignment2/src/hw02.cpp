@@ -8,7 +8,7 @@
 #include "string"
 
 #include "Raster.h"
-#include "Direction.h"
+#include "DA.h"
 
 using std::cout;
 using std::ios;
@@ -51,10 +51,8 @@ int main(int argc, const char* argv[])
     if (argc <= 1) {
         cout << "This is: " << argv[0] << '\n';
         cout << '\n';
-        cout << "Please Call this program with two files as program arguments" << '\n';
+        cout << "Please call this program with one input file name(full path) as a program argument" << '\n';
         cout << '\n';
-        cout << "1. The first argument would be the FULL file path of the input file; " << '\n';
-        cout << "2. The second argument would be the FULL file path and NAME of the output raster; " << '\n';
 
         return EXIT_FAILURE;
     }
