@@ -24,7 +24,9 @@ struct Raster {
 
 };*/
 
+
 // A structure that links to a single cell in a Raster
+
 
 struct RasterCell {
     int row, col; // row and column of the cell
@@ -42,7 +44,11 @@ struct RasterCell {
     bool operator<(const RasterCell& other) const;
 };
 
+
 // A structure that represents the Raster with RasterCells 
+// Inspired by the Raster structure which is kindly given by Ken:
+// https://gitlab.tudelft.nl/3d/geo1015.2021
+
 
 struct ProRaster {
     std::vector<RasterCell> propixels;

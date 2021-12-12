@@ -1,9 +1,8 @@
 #include <iostream>
-#include <fstream>
-#include <queue>
-
-#include "Raster.h"
 #include "DA.h"
+
+// #include <queue>
+// #include "Raster.h"
 
 
 void add_outlets_boundary(const int& Nrows, const int& Ncols, ProRaster& r,
@@ -12,22 +11,22 @@ void add_outlets_boundary(const int& Nrows, const int& Ncols, ProRaster& r,
     for (int j = 0; j != Ncols; ++j) {
         r(0, j).insertion_order = ++order;
         r(0, j).listed = true;
-        myqueue.emplace(r(0, j)); //top
+        myqueue.emplace(r(0, j)); // top
     }
     for (int i = 1; i != Nrows; ++i) {
         r(i, Ncols - 1).insertion_order = ++order;
         r(i, Ncols - 1).listed = true;
-        myqueue.emplace(r(i, Ncols - 1)); //rightmost
+        myqueue.emplace(r(i, Ncols - 1)); // rightmost
     }
     for (int j = Ncols - 2; j != -1; --j) {
         r(Nrows - 1, j).insertion_order = ++order;
         r(Nrows - 1, j).listed = true;
-        myqueue.emplace(r(Nrows - 1, j)); //bottom
+        myqueue.emplace(r(Nrows - 1, j)); // bottom
     }
     for (int i = Nrows - 2; i != 0; --i) {
         r(i, 0).insertion_order = ++order;
         r(i, 0).listed = true;
-        myqueue.emplace(r(i, 0)); //leftmost
+        myqueue.emplace(r(i, 0)); // leftmost
     }
 }
 
@@ -43,18 +42,18 @@ int adjacent_pixel_types(const int& row, const int& col, const int& Nrows, const
     if (row > (Nrows - 1) || col > (Ncols - 1) || row < 0 || col < 0)return 0; //if index is inappropriate
 
     // each cell has 3 adjacent pixels, encoding order: clockwise(1-2-3-4)
-    else if (row == col && row == 0)return 31; //up-left 
-    else if (row == 0 && col == (Ncols - 1))return 32; //up-right
-    else if (row == (Nrows - 1) && col == (Ncols - 1))return 33; //low-right
-    else if (row == (Nrows - 1) && col == 0)return 34; //low-left
+    else if (row == col && row == 0)return 31; // up-left 
+    else if (row == 0 && col == (Ncols - 1))return 32; // up-right
+    else if (row == (Nrows - 1) && col == (Ncols - 1))return 33; // low-right
+    else if (row == (Nrows - 1) && col == 0)return 34; // low-left
 
     // each cell has 5 adjacent pixels
-    else if (row == 0 && col > 0 && col < (Ncols - 1))return 51; //top row
-    else if (col == Ncols - 1 && row > 0 && row < (Nrows - 1))return 52; //rightmost row
-    else if (row == (Nrows - 1) && col > 0 && col < (Ncols - 1))return 53; //bottom row
-    else if (col == 0 && row > 0 && row < (Nrows - 1))return 54; //leftmost row
+    else if (row == 0 && col > 0 && col < (Ncols - 1))return 51; // top row
+    else if (col == Ncols - 1 && row > 0 && row < (Nrows - 1))return 52; // rightmost row
+    else if (row == (Nrows - 1) && col > 0 && col < (Ncols - 1))return 53; // bottom row
+    else if (col == 0 && row > 0 && row < (Nrows - 1))return 54; // leftmost row
 
-    //each cell has 8 adjacent pixels
+    // each cell has 8 adjacent pixels
     return 8; 
 }
 
@@ -88,7 +87,7 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
         }// bottom neighbour
       
         break;
-    } //up-left corner
+    } // up-left corner
 
     case 32: {
         if (r(i + 1, j).listed == false && r(i + 1, j).visited == false)
@@ -113,7 +112,7 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
         }// left neighbour
 
         break;
-    } //up-right corner
+    } // up-right corner
 
     case 33: {
         if (r(i, j - 1).listed == false && r(i, j - 1).visited == false)
@@ -249,38 +248,38 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
             r(i, j - 1).insertion_order = ++order;
             r(i, j - 1).listed = true;
             myqueue.emplace(r(i, j - 1));
-        } //left neighbour
+        } // left neighbour
 
         if (r(i - 1, j - 1).listed == false && r(i - 1, j - 1).visited == false)
         {
             r(i - 1, j - 1).insertion_order = ++order;
             r(i - 1, j - 1).listed = true;
             myqueue.emplace(r(i - 1, j - 1));
-        } //diagonal neighbour
+        } // diagonal neighbour
 
         if (r(i - 1, j).listed == false && r(i - 1, j).visited == false)
         {
             r(i - 1, j).insertion_order = ++order;
             r(i - 1, j).listed = true;
             myqueue.emplace(r(i - 1, j));
-        } //top neighbour
+        } // top neighbour
 
         if (r(i - 1, j + 1).listed == false && r(i - 1, j + 1).visited == false)
         {
             r(i - 1, j + 1).insertion_order = ++order;
             r(i - 1, j + 1).listed = true;
             myqueue.emplace(r(i - 1, j + 1));
-        } //diagonal neighbour
+        } // diagonal neighbour
 
         if (r(i, j + 1).listed == false && r(i, j + 1).visited == false)
         {
             r(i, j + 1).insertion_order = ++order;
             r(i, j + 1).listed = true;
             myqueue.emplace(r(i, j + 1));
-        } //right neighbour
+        } // right neighbour
 
         break;
-    } //bottom row
+    } // bottom row
 
     case 54: {
         if (r(i - 1, j).listed == false && r(i - 1, j).visited == false)
@@ -288,38 +287,38 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
             r(i - 1, j).insertion_order = ++order;
             r(i - 1, j).listed = true;
             myqueue.emplace(r(i - 1, j));
-        } //top neighbour
+        } // top neighbour
 
         if (r(i - 1, j + 1).listed == false && r(i - 1, j + 1).visited == false)
         {
             r(i - 1, j + 1).insertion_order = ++order;
             r(i - 1, j + 1).listed = true;
             myqueue.emplace(r(i - 1, j + 1));
-        } //diagonal neighbour
+        } // diagonal neighbour
 
         if (r(i, j + 1).listed == false && r(i, j + 1).visited == false)
         {
             r(i, j + 1).insertion_order = ++order;
             r(i, j + 1).listed = true;
             myqueue.emplace(r(i, j + 1));
-        } //right neighbour
+        } // right neighbour
 
         if (r(i + 1, j + 1).listed == false && r(i + 1, j + 1).visited == false)
         {
             r(i + 1, j + 1).insertion_order = ++order;
             r(i + 1, j + 1).listed = true;
             myqueue.emplace(r(i + 1, j + 1));
-        } //diagonal neighbour
+        } // diagonal neighbour
 
         if (r(i + 1, j).listed == false && r(i + 1, j).visited == false)
         {
             r(i + 1, j).insertion_order = ++order;
             r(i + 1, j).listed = true;
             myqueue.emplace(r(i + 1, j));
-        } //bottom neighbour
+        } // bottom neighbour
 
         break;
-    } //leftmost row
+    } // leftmost row
 
     case 8: {
         if (r(i - 1, j - 1).listed == false && r(i - 1, j - 1).visited == false)
@@ -327,56 +326,56 @@ void add_neighbours(const int& i, const int& j, ProRaster& r,
             r(i - 1, j - 1).insertion_order = ++order;
             r(i - 1, j - 1).listed = true;
             myqueue.emplace(r(i - 1, j - 1));
-        } //diagonal neighbour
+        } // diagonal neighbour
 
         if (r(i - 1, j).listed == false && r(i - 1, j).visited == false)
         {
             r(i - 1, j).insertion_order = ++order;
             r(i - 1, j).listed = true;
             myqueue.emplace(r(i - 1, j));
-        } //top neighbour
+        } // top neighbour
 
         if (r(i - 1, j + 1).listed == false && r(i - 1, j + 1).visited == false)
         {
             r(i - 1, j + 1).insertion_order = ++order;
             r(i - 1, j + 1).listed = true;
             myqueue.emplace(r(i - 1, j + 1));
-        } //diagonal neighbour
+        } // diagonal neighbour
 
         if (r(i, j + 1).listed == false && r(i, j + 1).visited == false)
         {
             r(i, j + 1).insertion_order = ++order;
             r(i, j + 1).listed = true;
             myqueue.emplace(r(i, j + 1));
-        } //right neighbour
+        } // right neighbour
 
         if (r(i + 1, j + 1).listed == false && r(i + 1, j + 1).visited == false)
         {
             r(i + 1, j + 1).insertion_order = ++order;
             r(i + 1, j + 1).listed = true;
             myqueue.emplace(r(i + 1, j + 1));
-        } //diagonal neighbour
+        } // diagonal neighbour
 
         if (r(i + 1, j).listed == false && r(i + 1, j).visited == false)
         {
             r(i + 1, j).insertion_order = ++order;
             r(i + 1, j).listed = true;
             myqueue.emplace(r(i + 1, j));
-        } //bottom neighbour
+        } // bottom neighbour
 
         if (r(i + 1, j - 1).listed == false && r(i + 1, j - 1).visited == false)
         {
             r(i + 1, j - 1).insertion_order = ++order;
             r(i + 1, j - 1).listed = true;
             myqueue.emplace(r(i + 1, j - 1));
-        } //diagonal neighbour
+        } // diagonal neighbour
 
         if (r(i, j - 1).listed == false && r(i, j - 1).visited == false)
         {
             r(i, j - 1).insertion_order = ++order;
             r(i, j - 1).listed = true;
             myqueue.emplace(r(i, j - 1));
-        } //left neighbour
+        } // left neighbour
 
         break;
     } // cells with 8 neighbours
@@ -394,179 +393,179 @@ void compute_flow_direction(ProRaster& r,
 {
     while (!myqueue.empty())
     {
-        //process the current cell
-        int i(myqueue.top().row), j(myqueue.top().col); //row and col of processing cell
+        // process the current cell
+        int i(myqueue.top().row), j(myqueue.top().col); // row and col of processing cell
         r(i, j).visited = true; // current cell: visited = true
         myqueue.pop();
 
-        //set directions of its neighbours
+        // set directions of its neighbours
         int loc(adjacent_pixel_types(i, j, r.nrows, r.ncols));
         switch (loc){
         
         case 31: {
-            //right neighbour
+            // right neighbour
             if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i + 1, j + 1).direction)r(i + 1, j + 1).direction = 32;
             
-            //bottom neighbour
+            // bottom neighbour
             if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
 
             break;
-        } //up-left corner
+        } // up-left corner
 
         case 32: {
-            //bottom neighbour
+            // bottom neighbour
             if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i + 1, j - 1).direction)r(i + 1, j - 1).direction = 128;
             
-            //left neighbour
+            // left neighbour
             if (!r(i, j - 1).direction)r(i, j - 1).direction = 1;
             
             break;
-        } //up-right corner
+        } // up-right corner
 
         case 33: {
-            //left neighbour
+            // left neighbour
             if (!r(i, j - 1).direction)r(i, j - 1).direction = 1;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i - 1, j - 1).direction)r(i - 1, j - 1).direction = 2;
             
-            //top neighbour
+            // top neighbour
             if (!r(i - 1, j).direction)r(i - 1, j).direction = 4;
 
             break;
-        } //low-right corner
+        } // low-right corner
 
         case 34: {
-            //top neighbour
+            // top neighbour
             if (!r(i - 1, j).direction)r(i - 1, j).direction = 4;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i - 1, j + 1).direction)r(i - 1, j + 1).direction = 8;
             
-            //right neighbour
+            // right neighbour
             if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
 
             break;
-        } //low-left corner
+        } // low-left corner
 
         case 51: {
-            //right neighbour
+            // right neighbour
             if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i + 1, j + 1).direction)r(i + 1, j + 1).direction = 32;
             
-            //bottom neighbour
+            // bottom neighbour
             if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i + 1, j - 1).direction)r(i + 1, j - 1).direction = 128;
             
-            //left neighbour
+            // left neighbour
             if (!r(i, j - 1).direction)r(i, j - 1).direction = 1;
             
             break;
-        } //top row
+        } // top row
 
         case 52: {
-            //bottom neighbour
+            // bottom neighbour
             if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i + 1, j - 1).direction)r(i + 1, j - 1).direction = 128;
             
-            //left neighbour
+            // left neighbour
             if (!r(i, j - 1).direction)r(i, j - 1).direction = 1;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i - 1, j - 1).direction)r(i - 1, j - 1).direction = 2;
             
-            //top neighbour
+            // top neighbour
             if (!r(i - 1, j).direction)r(i - 1, j).direction = 4;
             
             break;
-        } //rightmost row
+        } // rightmost row
         
         case 53: {
-            //left neighbour
+            // left neighbour
             if (!r(i, j - 1).direction)r(i, j - 1).direction = 1;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i - 1, j - 1).direction)r(i - 1, j - 1).direction = 2;
             
-            //top neighbour
+            // top neighbour
             if (!r(i - 1, j).direction)r(i - 1, j).direction = 4;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i - 1, j + 1).direction)r(i - 1, j + 1).direction = 8;
             
-            //right neighbour
+            // right neighbour
             if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
             
             break;
-        } //bottom row
+        } // bottom row
 
         case 54: {
-            //top neighbour
+            // top neighbour
             if (!r(i - 1, j).direction)r(i - 1, j).direction = 4;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i - 1, j + 1).direction)r(i - 1, j + 1).direction = 8;
             
-            //right neighbour
+            // right neighbour
             if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i + 1, j + 1).direction)r(i + 1, j + 1).direction = 32;
             
-            //bottom neighbour
+            // bottom neighbour
             if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
 
             break;
-        } //leftmost row
+        } // leftmost row
 
         case 8: {
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i - 1, j - 1).direction)r(i - 1, j - 1).direction = 2;
       
-            //top neighbour
+            // top neighbour
             if (!r(i - 1, j).direction)r(i - 1, j).direction = 4;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i - 1, j + 1).direction)r(i - 1, j + 1).direction = 8;
             
-            //right neighbour
+            // right neighbour
             if (!r(i, j + 1).direction)r(i, j + 1).direction = 16;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i + 1, j + 1).direction)r(i + 1, j + 1).direction = 32;
             
-            //bottom neighbour
+            // bottom neighbour
             if (!r(i + 1, j).direction)r(i + 1, j).direction = 64;
             
-            //diagonal neighbour
+            // diagonal neighbour
             if (!r(i + 1, j - 1).direction)r(i + 1, j - 1).direction = 128;
             
-            //left neighbour
+            // left neighbour
             if (!r(i, j - 1).direction)r(i, j - 1).direction = 1;
             
             break;
-        } //cells with 8 neighbours
+        } // cells with 8 neighbours
 
         default:
             break;
         }
 
-        //add the processing cell to the vector(opposite order)
+        // add the processing cell to the vector(opposite order)
         cellsvector.emplace_back(r(i, j));
 
-        //add the neighbours to the queue
+        // add the neighbours to the queue
         add_neighbours(i, j, r, myqueue, order);
 
     }
@@ -580,7 +579,7 @@ void compute_flow_accumulation(ProRaster& r, std::vector<RasterCell>& cell_vecto
     first cell in the priority queue is still unknown, yet it is added to the cell_vector
     */
 
-    //assign the direction of the first cell in cell_vector
+    // assign the direction of the first cell in cell_vector
     cell_vector.front().direction = r(cell_vector.front().row, cell_vector.front().col).direction;
     
     while (!cell_vector.empty()) {
@@ -616,7 +615,7 @@ void compute_flow_accumulation(ProRaster& r, std::vector<RasterCell>& cell_vecto
         default:
             break;
         }
-        //pop the processing cell
+        // pop the processing cell
         cell_vector.pop_back();
     }
 }
