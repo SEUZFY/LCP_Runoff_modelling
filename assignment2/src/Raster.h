@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _RASTER_H_
+#define _RASTER_H_
+
 #include <vector>
 
 // Storage and access of a raster of a given size
@@ -69,3 +71,5 @@ struct ProRaster {
     // Output the accumulation proraster file line by line
     void output_accumulation(int& current_line, unsigned int* line);
 };
+
+#endif

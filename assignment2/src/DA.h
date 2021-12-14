@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _DA_H
+#define _DA_H
 
 #include <queue>
 #include "Raster.h"
@@ -25,3 +26,4 @@ void compute_flow_direction(ProRaster& r,
 // compute every accumulation of each cell
 void compute_flow_accumulation(ProRaster& r, std::vector<RasterCell>& cell_vector);
 
+#endif
