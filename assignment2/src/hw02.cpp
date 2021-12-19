@@ -63,7 +63,7 @@ void flow_accumulation(Raster raster)
 int main(int argc, const char* argv[])
 {  
     
-    std::ios::sync_with_stdio(false); // speed up for cin and std::std::cout
+    std::ios::sync_with_stdio(false); // speed up for cin and std::cout
 
     if (argc <= 1) {
         std::cout << "This is: " << argv[0] << '\n';
