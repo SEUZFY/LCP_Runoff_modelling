@@ -1,3 +1,20 @@
+/*********************************************************
+ * The source code is inspired by the skeleton:
+ * https://gitlab.tudelft.nl/3d/geo1015.2021/
+ *
+ * Original author:
+ * Ken Arroyo Ohori
+ * https://3d.bk.tudelft.nl/ken/en/
+ *
+ *********************************************************
+ *
+ * The whole project and related files are available at:
+ * https://github.com/SEUZFY/assignment2
+ * If a bug is found or there is a better way to implement it, please do not hesitate to contact:
+ * F.Zhang-12@student.tudelft.nl(or zmocheng@gmail.com)
+ *
+ *********************************************************/
+
 #include "Raster.h"
 #include <cassert>
 
