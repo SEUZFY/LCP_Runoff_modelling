@@ -10,9 +10,9 @@ The idea is from this paper: https://hess.copernicus.org/articles/15/667/2011/
 
 Enter into:
 
-**MajorSolution -> assignment2 -> x64 -> Release**, and you’ll be able to see **assignment2.exe** file, open the cmd window here and pass the FULL PATH of the input file, this FULL PATH is also where the generated files will go:
+**MajorSolution -> assignment2 -> x64 -> Release**, and you’ll be able to see **assignment2.exe** file, open the command window here and pass the **FULLPATH** of the input file as an argument for the program(**NB**: this **FULLPATH** is also where the **generated files** will go):
 
-...\MajorSolution\assignment2\x64\Release>assignment2.exe FULLPATH
+**...\MajorSolution\assignment2\x64\Release>assignment2.exe FULLPATH**
 
 An example:
 
