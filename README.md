@@ -18,7 +18,7 @@ An example:
 
 ![image](https://user-images.githubusercontent.com/72781910/146770183-5cd9ccc2-eccc-4f5a-b48f-3000628f499c.png)
 
-NB: If no argument is supplied, the program won’t execute the process of flow direction and flow accumulation, instead it will give an prompt to require an argument to execute the expected process.
+**NB**: If no argument is supplied, the program won’t execute the process of flow direction and flow accumulation, instead it will give an prompt to require an argument to execute the expected process.
 
 **--INPUT EXAMPLE**
 
