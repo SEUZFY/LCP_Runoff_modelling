@@ -40,6 +40,8 @@ An hgt file: download from this website: http://dwtkns.com/srtm30m/
 
 ![image](https://user-images.githubusercontent.com/72781910/146772890-310fee57-a6f8-4504-9486-cdfac590c274.png)
 
+**--GOOD TO KNOW**
 
+If there is a large area of sea or inland lake in the input file, it may affect the results. Although the LCP algorithm will not be greatly affected by that, the input file without a large area of sea or inland lake may lead to more pleasant results.
 
 
