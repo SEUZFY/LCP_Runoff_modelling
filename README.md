@@ -52,4 +52,8 @@ An hgt file: download from this website: http://dwtkns.com/srtm30m/
 
 If there is a large area of sea or inland lake in the input file, it may affect the results. Although the LCP algorithm will not be greatly affected by that, the input file without a large area of sea or inland lake may lead to more pleasant results.
 
+**-- SPECIAL THANKS**
 
+Thanks for my collaborator Yitong Xia(xiayitong0630@gmail.com). During the implementation of this algorithm, we sincerely discussed and compared each other's execution results, thank her for her efforts.
+
+And particular thanks go to my good friend Lin(linyinjia@outlook.com). I discussed with him whether to use _emplace_back()_ instead of _push_back()_ in the process of using _std::vector_. And we discussed on the topic of execution efficiency of static array and _std::vecotr_ array.
