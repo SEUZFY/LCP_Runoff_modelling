@@ -5,6 +5,12 @@ The idea is from this paper: https://hess.copernicus.org/articles/15/667/2011/
  * https://gitlab.tudelft.nl/3d/geo1015.2021/ Original author: Ken Arroyo Ohori (https://3d.bk.tudelft.nl/ken/en/)
  * If a bug is found or there is a better way to implement it, please do not hesitate to contact:
  * F.Zhang-12@student.tudelft.nl(or zmocheng@gmail.com)
+
+
+**--REMINDER**
+
+This project was compiled in Visual Studio 2019 Community on 64 bit windows platform, that being said, it may not directly work on a mac/linux platform, though a cmake project can be built with all source files in: assignment2 -> src. (**External dependency**: **GDAL**).
+ 
  
 **--HOW TO USE**
 
