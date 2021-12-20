@@ -16,6 +16,8 @@ This project was compiled in Visual Studio 2019 Community on 64 bit windows plat
 
 An package can be downloaded at: https://github.com/SEUZFY/LCP_Runoff_modelling/releases
 
+Or just clone this repository in a x64 windows computer, then compile and run it in Visual Studio(version >= 2019).
+
 Enter into:
 
 **assignment2 -> x64 -> Release**, and you’ll be able to see **assignment2.exe** file, open the command window here and pass the **FULLPATH** of the input file as an argument for the program(**NB**: this **FULLPATH** is also where the **generated files** will go):
